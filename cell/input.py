@@ -82,7 +82,7 @@ class Input(cell.cell.Cell):
 
     def updateAnim(self):
         self.iterAnim += 1 
-        if self.iterAnim>= 100:#we want a new cube every 4 seconds
+        if self.iterAnim>= 150:#we want a new cube every 3 seconds
             self.iterAnim = 0
             self.level.physicManager.addBox( self.buildBox() )
     
