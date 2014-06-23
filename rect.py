@@ -18,8 +18,21 @@ class Rect:
         self.bottom = y+h
         self.w = w
         self.h = h
+    
+    def hasCommonPoint(self,r):
+        if r.top > self.bottom:
+            return False
+        if r.left > self.right:
+            return False
+        if r.bottom < self.top:
+            return False
+        if r.right < self.left:
+            return False
+        return True
         
     def intersect(self,r):
+        if not self.hasCommonPoint(r):
+            return Rect((self.left,self.top),(0,0))
         top = max( r.top , self.top )
         left = max( r.left , self.left )
         bottom = min( r.bottom , self.bottom )

@@ -56,7 +56,7 @@ class Belt(cell.cell.Cell):
         self.iterAnim = 0
 
     def updateAnim(self):
-        self.iterAnim = ( self.iterAnim + 1 )%50
+        self.iterAnim = ( self.iterAnim + 3 )%50
 
     def makeAnimSurf(self,size,adjCell = [None,None,None,None]):
         #detect adjacent cells

@@ -65,8 +65,6 @@ class Input(cell.cell.Cell):
         #shadow inside the hole
         pygame.draw.polygon( self.baseSurf , util.multColor(self.color,0.8) , pointsHoleLeft )
         pygame.draw.polygon( self.baseSurf , util.multColor(self.color,0.5) , pointsHoleTop )
-        #translating platform
-        pygame.draw.polygon( self.baseSurf , util.multColor(self.color,0.9) , pointsPlatform )
         #draw the basic shape
         pygame.draw.polygon( self.baseSurf , self.color , pointsTop )
         pygame.draw.polygon( self.baseSurf , util.multColor(self.color,0.8) , pointsRight )
@@ -78,20 +76,32 @@ class Input(cell.cell.Cell):
         window.blit( self.baseSurf , pos )
 
     def initAnim(self):
-        self.iterAnim = 200
+        self.iterAnim = 50
+        self.inputtingBox = None
 
     def updateAnim(self):
-        self.iterAnim += 1 
-        if self.iterAnim>= 150:#we want a new cube every 3 seconds
+        self.iterAnim += 1
+        if self.iterAnim < 100:#wait
+            pass
+        elif self.iterAnim <= 150:#making the animation
+            self.inputtingBox = self.buildBox()
+        elif self.iterAnim >= 150:#we want a new cube every 3 seconds
             self.iterAnim = 0
-            self.level.physicManager.addBox( self.buildBox() )
+            self.level.physicManager.addBox( self.inputtingBox )
     
     def buildBox(self):
         newBox = box.box.Box( self.color , self.x+0.5 , self.y+0.5 , self.size*0.5 )
         return newBox
 
     def makeAnimSurf(self,size):
-        self.animSurf = None
+        if self.inputtingBox and self.iterAnim >= 100 and self.iterAnim <= 150:
+            animSize = size * 3/4
+            animLength = size * 1/2 - self.inputtingBox.offset/3
+            animPos = animSize - animLength * (self.iterAnim-100)/50
+            self.animSurf = pygame.Surface( (animSize,animSize) ,SRCALPHA)
+            self.animSurf.blit( self.inputtingBox.surf , ( animPos,animPos) )
+        else:
+            self.animSurf = None
 
 
 

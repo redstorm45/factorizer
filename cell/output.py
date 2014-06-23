@@ -74,12 +74,25 @@ class Output(cell.cell.Cell):
 
     def initAnim(self):
         self.iterAnim = 0
+        self.outputtingBox = None
 
     def updateAnim(self):
-        self.iterAnim = ( self.iterAnim + 1 )%50
+        if self.iterAnim>0:
+            self.iterAnim -= 1
 
     def makeAnimSurf(self,size):
-        self.animSurf = None
+        if self.outputtingBox and self.iterAnim>0:
+            animSize = size * 3/4
+            animLength = size * 1/2 - self.outputtingBox.offset/3
+            animPos = animSize - animLength * self.iterAnim/50
+            self.animSurf = pygame.Surface( (animSize,animSize) ,SRCALPHA)
+            self.animSurf.blit( self.outputtingBox.surf , ( animPos,animPos) )
+        else:
+            self.animSurf = None
+
+    def takeBox(self,b):
+        self.iterAnim = 50
+        self.outputtingBox = b
 
 
 

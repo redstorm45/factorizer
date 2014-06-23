@@ -293,8 +293,8 @@ class Game:
         #draw the boxes
         for b in self.level.physicManager.listBoxes:
             xOffLvl,yOffLvl = offsetLevel
-            xPos = b.offset + 37.5 + self.cellSize*b.x + xOffLvl
-            yPos = b.offset + 37.5 + self.cellSize*b.y + yOffLvl
+            xPos = b.offset + 37.5 + self.cellSize*b.x + xOffLvl -1
+            yPos = b.offset + 37.5 + self.cellSize*b.y + yOffLvl -1
             self.window.blit( b.surf , (xPos,yPos) )
         
         #draw toolbar

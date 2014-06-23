@@ -17,7 +17,7 @@ class Box:
         size = self.size
         outSize = size * 1.25
         
-        self.offset = -self.size*0.85
+        self.offset = -self.size*3/4
         
         self.middle = [ (0,0)    , (size,0)    , (size,size)       , (0,size)]
         self.bottom = [ (0,size) , (size,size) , (outSize,outSize) , (outSize-size,outSize)]

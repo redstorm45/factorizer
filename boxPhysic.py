@@ -38,11 +38,16 @@ class BoxPhysic:
 
     def tickModel(self):
         #output boxes
-        for x in range(self.level.width):
-            for y in range(self.level.height):
-                theCell = self.level.table[x][y]
-                if isinstance(theCell , cell.output.Output):
-                    pass
+        for b in self.listBoxes:
+            theCell = self.level.table[int(b.x)][int(b.y)]
+            if isinstance(theCell , cell.output.Output):
+                xMid = int(b.x) + 0.5
+                yMid = int(b.y) + 0.5
+                
+                if ( abs(b.x-xMid) < 0.02 and abs(b.y-yMid) < 0.02 ):#box is 1 iteration to the output
+                    #give bos to the output
+                    theCell.takeBox(b)
+                    self.listBoxes.remove(b)
         
         #get each box's applied force
         for b in self.listBoxes:
@@ -71,7 +76,7 @@ class BoxPhysic:
             
                         #get area of cropped rect
                         area = interRect.w * interRect.h
-            
+                        
                         #get the generated force
                         forceX,forceY = self.getCellForce( theCell , (b.x,b.y))
                         
@@ -79,14 +84,18 @@ class BoxPhysic:
                         forceX *= (area*4)
                         forceY *= (area*4)
                         
-                        force = (forceX,forceY)
-                    fx,fy = force
-                    totalForceX += fx
-                    totalForceY += fy
-                    
-            #apply resulting force to the box
-            b.x += totalForceX*0.02
-            b.y += totalForceY*0.02
+                        totalForceX += forceX
+                        totalForceY += forceY
+            
+            b.baseForce = (totalForceX , totalForceY)
+        
+        #TODO : add here a test for collisions
+        
+        #apply resulting force to the box
+        for b in self.listBoxes:
+            fx,fy = b.baseForce
+            b.x += fx*0.02
+            b.y += fy*0.02
             
     def getActionRect(self,c):
         #belt (cropped edges)
