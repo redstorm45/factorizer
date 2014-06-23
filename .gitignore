@@ -22,6 +22,12 @@ var/
 .installed.cfg
 *.egg
 
+# Geany script
+geany_run_script.bat
+
+#pictures
+*.png
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
