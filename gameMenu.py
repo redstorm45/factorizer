@@ -112,7 +112,7 @@ class GameMenu:
 
     def run(self):
         self.window = pygame.display.set_mode(self.size)
-        pygame.display.set_caption("Factorizer")
+        pygame.display.set_caption("Factory Maker")
         self.clock = pygame.time.Clock()
         
         running = True

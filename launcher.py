@@ -24,12 +24,9 @@
 '''
 
 
-
-
-import editor
 import gameMenu
 
-print(" *** factorizer v3 (alpha) *** ")
+print(" *** Factory Maker v4 (alpha) *** ")
 
 theGame = gameMenu.GameMenu()
 theGame.run()

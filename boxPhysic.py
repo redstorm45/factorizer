@@ -128,7 +128,7 @@ class BoxPhysic:
         return rect.Rect((c.x,c.y),(1.0,1.0))
     
     def getCellForce(self,c,posBox):
-        #only outputs are different
+        #outputs tend to center
         if isinstance( c , cell.output.Output ):
             xBox,yBox = posBox
             toOutX = c.x+0.5-xBox
@@ -139,6 +139,40 @@ class BoxPhysic:
                 mult = dist/0.02
             if dist != 0:
                 return ( mult*toOutX / dist , mult*toOutY / dist )
+                
+        #belt tend to directional axis
+        if isinstance( c , cell.belt.Belt ):
+            fx,fy = c.force
+            
+            orientX = False
+            if c.orient == 1 or c.orient == 3:
+                orientX = True
+            xBox,yBox = posBox
+            
+            dirPosX = c.x+0.5
+            dirPosY = c.y+0.5
+            
+            if orientX:
+                dirPosY = yBox
+            else:
+                dirPosX = xBox
+                
+            toPosX = dirPosX - xBox
+            toPosY = dirPosY - yBox
+            
+            fx,fy = c.force
+            
+            toEndX = toPosX*2 + fx
+            toEndY = toPosY*2 + fy
+            
+            distTot = math.sqrt( toEndX**2 + toEndY**2 )
+            
+            mult = 1
+            if distTot <= 0.02:
+                mult = distTot/0.02
+                
+            if distTot != 0:
+                return ( mult*toEndX / distTot , mult*toEndY / distTot )
             
         #all other cells are directional
         #making a copy of the force

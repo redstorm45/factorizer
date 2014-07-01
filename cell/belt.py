@@ -99,7 +99,7 @@ class Belt(cell.cell.Cell):
         if ((self.orient == 0 and prevPresent) or (self.orient == 2 and nextPresent)):
             xSubOffset = 0
         ySubOffset = size*0.1
-        if ((self.orient == 3 and prevPresent) or (self.orient == 1 and nextPresent)):
+        if ((self.orient == 1 and prevPresent) or (self.orient == 3 and nextPresent)):
             ySubOffset = 0
         
         #build surfaces
