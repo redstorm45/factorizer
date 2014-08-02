@@ -35,12 +35,13 @@ class Box:
         self.size = size
         self.x = x
         self.y = y
+        self.height = 0
         
         self.makeSurf()
     
-    def makeSurf(self):
+    def makeSurf(self,iterVoid = 1.0):
+        outSize = self.size * 1.25
         size = self.size
-        outSize = size * 1.25
         
         self.offset = -self.size*3/4
         
@@ -52,3 +53,12 @@ class Box:
         pygame.draw.polygon( self.surf ,                self.color      , self.middle )
         pygame.draw.polygon( self.surf , util.multColor(self.color,0.5) , self.bottom )
         pygame.draw.polygon( self.surf , util.multColor(self.color,0.8) , self.right )
+        
+        if iterVoid != 0.0:
+            #make the box disapear in darkness
+            self.surf.lock()
+            for x in range(int(outSize)):
+                for y in range(int(outSize)):
+                    r,g,b,a = self.surf.get_at( (x,y) )
+                    self.surf.set_at( (x,y) , (r,g,b,a*iterVoid) )
+            self.surf.unlock()

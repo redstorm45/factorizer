@@ -75,7 +75,7 @@ class LevelManager:
                 objectives = []
                 for i in range(nbObj):
                     readC = l.readline().strip()
-                    objectives.append( self.readObjective(readC) )
+                    objectives.append( self.readObjective(readC,table) )
                 
                 #reading tools
                 nbTools = int(l.readline().strip())
@@ -138,10 +138,19 @@ class LevelManager:
     def readInConfig(self,data):
         return None
 
-    def readObjective(self,data):
+    def readObjective(self,data,table):
         listData = data.split(".",1)
-        obj = [ int(listData[0]) , int(listData[1]) ]
+        obj = [ self.findOutputCoord(int(listData[0]),table) , int(listData[1]) ]
         return obj
+    
+    def findOutputCoord(self,outputNum,table):
+        for x in range(len(table)):
+            for y in range(len(table[0])):
+                if table[x][y]:
+                    if isinstance(table[x][y],cell.output.Output):
+                        if table[x][y].id == outputNum:
+                            return (x,y)
+                
 
 
 

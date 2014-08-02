@@ -60,14 +60,27 @@ class BoxPhysic:
         #output boxes
         for b in self.listBoxes:
             theCell = self.level.table[int(b.x)][int(b.y)]
+            #make the box disapear in an output
             if isinstance(theCell , cell.output.Output):
                 xMid = int(b.x) + 0.5
                 yMid = int(b.y) + 0.5
                 
                 if ( abs(b.x-xMid) < 0.02 and abs(b.y-yMid) < 0.02 ):#box is 1 iteration to the output
-                    #give bos to the output
+                    #give box to the output
                     theCell.takeBox(b)
                     self.listBoxes.remove(b)
+            #the box falls in the void
+            if not theCell:
+                xMid = int(b.x) + 0.5
+                yMid = int(b.y) + 0.5
+                if ( abs(b.x-xMid) <= 0.28 and abs(b.y-yMid) <= 0.28 ):
+                    try:
+                        b.fallIter -= 1
+                        if b.fallIter <= 0:
+                            self.listBoxes.remove(b)
+                    except AttributeError:
+                        b.falling = True
+                        b.fallIter = 30
         
         #get each box's applied force
         for b in self.listBoxes:
@@ -113,6 +126,8 @@ class BoxPhysic:
         
         #apply resulting force to the box
         for b in self.listBoxes:
+            if hasattr( b , 'falling' ):
+                b.makeSurf( b.fallIter / 30.0 )
             fx,fy = b.baseForce
             b.x += fx*0.02
             b.y += fy*0.02

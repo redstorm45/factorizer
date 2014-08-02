@@ -40,6 +40,7 @@ import cell.cell
 import cell.input
 import cell.output
 import cell.belt
+import objectiveTooltip
 from pygame.locals import *
 
 colorGround = (100,100,100)
@@ -139,14 +140,14 @@ class Game:
         #add level surfaces
         for y in range(self.level.height):
             for x in range(self.level.width):
-                if (isinstance( self.level.table[x][y], cell.input.Input   ) or
-                    isinstance( self.level.table[x][y], cell.output.Output )):
-                    drawnCell = self.level.table[x][y]
-                    drawnCell.makeSurf(cellSize)
-                    xOffset,yOffset = drawnCell.offset
+                levelCell = self.getCellAt(x,y)
+                if (isinstance( levelCell, cell.input.Input   ) or
+                    isinstance( levelCell, cell.output.Output )):
+                    levelCell.makeSurf(cellSize)
+                    xOffset,yOffset = levelCell.offset
                     xPos = xOffset + 150 + cellSize*x
                     yPos = yOffset + 150 + cellSize*y
-                    self.preview.blit( drawnCell.baseSurf , (xPos,yPos) )
+                    self.preview.blit( levelCell.baseSurf , (xPos,yPos) )
                 else:#empty cell
                     xPos = 150 + cellSize*x
                     yPos = 150 + cellSize*y
@@ -226,17 +227,17 @@ class Game:
         #add level surfaces
         for y in range(self.level.height):
             for x in range(self.level.width):
-                if (isinstance( self.level.table[x][y], cell.input.Input   ) or
-                    isinstance( self.level.table[x][y], cell.output.Output ) or
-                    isinstance( self.level.table[x][y], cell.belt.Belt )):
-                    drawnCell = self.level.table[x][y]
-                    drawnCell.makeSurf(self.cellSize)
-                    xOffset,yOffset = drawnCell.offset
+                levelCell = self.getCellAt(x,y)
+                if (isinstance( levelCell, cell.input.Input   ) or
+                    isinstance( levelCell, cell.output.Output ) or
+                    isinstance( levelCell, cell.belt.Belt )):
+                    levelCell.makeSurf(self.cellSize)
+                    xOffset,yOffset = levelCell.offset
                     xPos = xOffset + 50 + self.cellSize*x
                     yPos = yOffset + 50 + self.cellSize*y
-                    self.editorLvlSurf.blit( drawnCell.baseSurf , (xPos,yPos) )
-                    if drawnCell.staticSurf:
-                        self.editorLvlSurf.blit( drawnCell.staticSurf , (xPos,yPos) )
+                    self.editorLvlSurf.blit( levelCell.baseSurf , (xPos,yPos) )
+                    if levelCell.staticSurf:
+                        self.editorLvlSurf.blit( levelCell.staticSurf , (xPos,yPos) )
                 elif self.selectedTool:
                     if ( (x,y) == self.selectedTool.phantomPos):
                         xOffset,yOffset = self.selectedTool.dispObject.offset
@@ -267,6 +268,7 @@ class Game:
         for i in range(len(self.visibleTools)):
             self.visibleTools[i].draw(self.window,offset)
     
+    #draw the level (when it may be moving)
     def drawPlay(self,offset=(0,0),iterate= -500):
         #calculate all offsets
         xOff,yOff = offset
@@ -305,6 +307,14 @@ class Game:
                     self.window.blit( drawnCell.baseSurf , (xPos,yPos) )
                     if drawnCell.animSurf:
                         self.window.blit( drawnCell.animSurf , (xPos,yPos) )
+                    #draw output tooltip
+                    if isinstance(drawnCell,cell.output.Output):
+                        for o in self.objectives:
+                            if o.pos == (x,y):
+                                xOffset,yOffset = o.offset
+                                xPos = xOffset + 50 + self.cellSize*x + xOffLvl
+                                yPos = yOffset + 50 + self.cellSize*y + yOffLvl
+                                self.window.blit( o.surf , (xPos,yPos) )
                 else:#empty cell
                     xPos = 50 + self.cellSize*x + xOffLvl
                     yPos = 50 + self.cellSize*y + yOffLvl
@@ -345,6 +355,11 @@ class Game:
             for x in range(self.level.width):
                 if isinstance(self.level.table[x][y],cell.cell.Cell):
                     self.level.table[x][y].initAnim()
+                    
+        #initialize objectives
+        self.objectives = []
+        for o in self.level.objectives:
+            self.objectives.append( objectiveTooltip.objectiveTooltip( self.getCellAt( *o[0] ) , self.cellSize) )
     
     def tickPlay(self):
         #update animations

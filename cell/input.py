@@ -114,6 +114,7 @@ class Input(cell.cell.Cell):
             self.inputtingBox = self.buildBox()
         elif self.iterAnim >= 150:#we want a new cube every 3 seconds
             self.iterAnim = 0
+            self.inputtingBox.height = self.size/4
             self.level.physicManager.addBox( self.inputtingBox )
     
     def buildBox(self):

@@ -102,6 +102,14 @@ class ToolCell:
         if self.dispObject.staticSurf:
             self.dispSurf.blit(self.dispObject.staticSurf,(0,0))
         
+        #make everything transparent
+        self.dispSurf.lock()
+        for x in range(self.dispSurf.get_width()):
+            for y in range(self.dispSurf.get_height()):
+                r,g,b,a = self.dispSurf.get_at((x,y))
+                self.dispSurf.set_at((x,y),(r,g,b,a*0.6))
+        self.dispSurf.unlock()
+        
     def draw(self,window,offset):
         xOff,yOff = self.object.offset
         xOff2,yOff2 = offset
