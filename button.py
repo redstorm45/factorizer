@@ -27,7 +27,7 @@ import util
 from pygame.locals import *
 
 class Button:
-    def __init__(self,textSurf,color,inSize,depthRatio,squareView = True):
+    def __init__(self,textSurf,color,inSize,depthRatio,squareView = True,backColor = (50,50,50)):
         #check for valid inputs
         if textSurf == None:
             return
@@ -36,6 +36,7 @@ class Button:
 
         self.textSurf = textSurf
         self.color = color
+        self.backColor = backColor
         #get the size of inside rect
         inW , inH = inSize
         inW = max(inW,textSurf.get_width())
@@ -74,7 +75,10 @@ class Button:
         colorRig = util.multColor(color,0.8)
         #make surface
         surf = pygame.Surface( self.size )
-        surf.fill( (50,50,50) )
+        if self.backColor:
+            surf.fill( self.backColor )
+        else:
+            surf = pygame.Surface( self.size , SRCALPHA )
         #add polygons
         pygame.draw.polygon( surf,color   ,self.middle )
         pygame.draw.polygon( surf,colorBot,self.bottom )

@@ -34,6 +34,11 @@ import cell.toolCell
 class LevelManager:
     def __init__(self):
         self.levelList = []
+    
+    def getLevelByNum(self,n):
+        for l in self.levelList:
+            if l.number == n:
+                return l
 
     def loadLevels(self):
         num = 0
@@ -87,7 +92,7 @@ class LevelManager:
                 l.close()
 
                 #create level
-                loaded = level.Level(name,table,inputConfigs,objectives,listTools)
+                loaded = level.Level(num,name,table,inputConfigs,objectives,listTools)
 
             except Exception as e:
                 print(str(e)) #debugging

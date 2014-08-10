@@ -106,16 +106,18 @@ class Input(cell.cell.Cell):
         self.iterAnim = 50
         self.inputtingBox = None
 
-    def updateAnim(self):
-        self.iterAnim += 1
+    def updateAnim(self,speed):
+        self.iterAnim += speed
         if self.iterAnim < 100:#wait
             pass
-        elif self.iterAnim <= 150:#making the animation
-            self.inputtingBox = self.buildBox()
-        elif self.iterAnim >= 150:#we want a new cube every 3 seconds
-            self.iterAnim = 0
-            self.inputtingBox.height = self.size/4
-            self.level.physicManager.addBox( self.inputtingBox )
+        elif self.iterAnim >= 100:#making the animation
+            if not self.inputtingBox:
+                self.inputtingBox = self.buildBox()
+            if self.iterAnim >= 150:#we want a new cube every 3 seconds
+                self.iterAnim -= 150.0
+                self.inputtingBox.height = self.size/4
+                self.level.physicManager.addBox( self.inputtingBox )
+                self.inputtingBox = None
     
     def buildBox(self):
         newBox = box.box.Box( self.color , self.x+0.5 , self.y+0.5 , self.size*0.5 )

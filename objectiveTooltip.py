@@ -28,15 +28,56 @@ import pygame
 from pygame.locals import *
 
 class objectiveTooltip:
-    def __init__(self,linkedCell,size):
+    def __init__(self,linkedCell,size,requested):
         self.pos = ( linkedCell.x , linkedCell.y )
         linkedCell.tooltip = self
         
+        self.requested = requested
+        self.complete = False
+        self.accepted = 0
         self.size = size
         self.makeSurf()
+    
+    def accept(self,box):
+        self.accepted += 1
+        self.makeSurf()
+        
+        if self.accepted >= self.requested:
+            self.complete = True
 
     def makeSurf(self):
-        self.offset = (-self.size * 0.25, -self.size*0.25)
+        self.offset = (-self.size * 0.25, -self.size*0.85)
+        sizeNear = int(self.size*0.1)
+        sizeFar = int(self.size*0.9)
+        sizeFarY = int(self.size*0.4)
+        sizeY = int(self.size*0.5)
         
-        self.surf = pygame.Surface( (self.size,self.size) , SRCALPHA )
-        self.surf.fill( (200,200,200,150) )
+        offProgress = int(self.size*0.15)
+        maxProgress = int(self.size*0.7)
+        heightProgress = int(self.size*0.2)
+        
+        self.surf = pygame.Surface( (self.size,self.size*0.6) , SRCALPHA )
+        pygame.draw.circle( self.surf , (150,150,150) , (sizeNear,sizeNear) , sizeNear )
+        pygame.draw.circle( self.surf , (150,150,150) , (sizeFar ,sizeNear) , sizeNear )
+        pygame.draw.circle( self.surf , (150,150,150) , (sizeFar,sizeFarY) , sizeNear )
+        pygame.draw.circle( self.surf , (150,150,150) , (sizeNear,sizeFarY) , sizeNear )
+        pygame.draw.rect( self.surf , (150,150,150) , ( sizeNear , 0.0 , sizeFar-sizeNear , sizeY ) )
+        pygame.draw.rect( self.surf , (150,150,150) , ( 0.0 , sizeNear , self.size , (sizeFarY-sizeNear) ) )
+        
+        pygame.draw.polygon( self.surf , (150,150,150) , [ (sizeY-sizeNear,sizeY),\
+                                                           (sizeY+sizeNear,sizeY),\
+                                                           (sizeY,sizeY+sizeNear)] )
+        
+        pygame.draw.rect( self.surf , (230,230,230) , ( offProgress , offProgress , maxProgress , heightProgress ) )
+        if self.accepted > 0:
+            progress = min(self.accepted / self.requested , 1.0)
+            pygame.draw.rect( self.surf , (230,40,40) , ( offProgress , offProgress , int(maxProgress * progress), heightProgress ) )
+        
+        #make the tooltip transparent
+        self.surf.lock()
+        for x in range( self.surf.get_width() ):
+            for y in range( self.surf.get_height() ):
+                r,g,b,a = self.surf.get_at( (x,y) )
+                self.surf.set_at( (x,y) , (r,g,b,a*0.6) )
+        self.surf.unlock()
+        

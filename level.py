@@ -26,7 +26,8 @@
 
 
 class Level:
-    def __init__(self,name,table,inputConfigs,objectives,listTools):
+    def __init__(self,number,name,table,inputConfigs,objectives,listTools):
+        self.number = number
         self.name = name
         self.table = table
         self.inputConfigs = inputConfigs

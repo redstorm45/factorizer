@@ -38,6 +38,7 @@ class Output(cell.cell.Cell):
         self.orient = int(infos[0])
         self.color = util.getColorFromStr(infos[1])
         self.id = int(infos[2])
+        self.tooltip = None
         
         self.acceptAny = ( infos[1] == "any" )
 
@@ -103,9 +104,9 @@ class Output(cell.cell.Cell):
         self.iterAnim = 0
         self.outputtingBox = None
 
-    def updateAnim(self):
+    def updateAnim(self,speed):
         if self.iterAnim>0:
-            self.iterAnim -= 1
+            self.iterAnim -= speed
 
     def makeAnimSurf(self,size):
         if self.outputtingBox and self.iterAnim>0:
@@ -118,6 +119,8 @@ class Output(cell.cell.Cell):
             self.animSurf = None
 
     def takeBox(self,b):
+        if self.tooltip:
+            self.tooltip.accept(b)
         self.iterAnim = 50
         self.outputtingBox = b
 

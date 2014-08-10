@@ -41,6 +41,7 @@ class BoxPhysic:
 
     def initModel(self):
         self.listBoxes = []
+        self.unprocessedTick = 0
         
         #make force field
         for x in range(self.level.width):
@@ -56,7 +57,13 @@ class BoxPhysic:
                 elif isinstance( self.level.table[x][y] , cell.cell.Cell ):
                     self.level.table[x][y].force = ( 0 , 0 )
 
-    def tickModel(self):
+    def tickModel(self,speed):
+        self.unprocessedTick += speed
+        while self.unprocessedTick >= 1.0:
+            self.singleTick()
+            self.unprocessedTick -= 1.0
+        
+    def singleTick(self):
         #output boxes
         for b in self.listBoxes:
             theCell = self.level.table[int(b.x)][int(b.y)]

@@ -46,20 +46,25 @@ import levelManager
 import game
 from pygame.locals import *
 
-SCR_MENU = 0     #selection local game / challenge
-SCR_LEVELS = 1   #selection of local levels
-SCR_PREVIEW = 2  #previewing of a level
-SCR_EDIT = 3     #when solving the level
-SCR_PLAY = 4     #level is being played
+SCR_MENU     = 0  #selection local game / challenge
+SCR_LEVELS   = 1  #selection of local levels
+SCR_PREVIEW  = 2  #previewing of a level
+SCR_EDIT     = 3  #when solving the level
+SCR_PLAY     = 4  #level is being played
+SCR_LEVELEND = 5  #level has finished
 #transitions
-TRANS_MENU_LEVEL    = 10
-TRANS_LEVEL_MENU    = 11
-TRANS_LEVEL_PREVIEW = 12
-TRANS_PREVIEW_LEVEL = 13
-TRANS_PREVIEW_EDIT  = 14
-TRANS_EDIT_LEVEL    = 15
-TRANS_EDIT_PLAY     = 16
-TRANS_PLAY_EDIT     = 17
+TRANS_MENU_LEVEL        = 10
+TRANS_LEVEL_MENU        = 11
+TRANS_LEVEL_PREVIEW     = 12
+TRANS_PREVIEW_LEVEL     = 13
+TRANS_PREVIEW_EDIT      = 14
+TRANS_EDIT_LEVEL        = 15
+TRANS_EDIT_PLAY         = 16
+TRANS_PLAY_EDIT         = 17
+TRANS_PLAY_LEVELEND     = 18
+TRANS_LEVELEND_EDIT     = 19
+TRANS_LEVELEND_LEVEL    = 20
+TRANS_LEVELEND_EDITNEXT = 21
 
 #transitions
 TRANS_PREV_EDIT = 2
@@ -158,7 +163,6 @@ class GameMenu:
                 self.currentScreen = TRANS_PREVIEW_LEVEL
                 self.idleTransition = 0
                 self.offsetTransition = 0
-        if self.currentScreen == SCR_PREVIEW:
             if(self.playground.previewBtPlay.isClick(pos)):
                 self.currentScreen = TRANS_PREVIEW_EDIT
                 self.idleTransition = 0
@@ -179,15 +183,46 @@ class GameMenu:
                 self.currentScreen = TRANS_PLAY_EDIT
                 self.idleTransition = 0
                 self.offsetTransition = 0
+                self.playground.destPlaySpeed = 1.0
+                self.playground.playSpeed = 1.0
                 self.playground.playing = False
                 self.playground.stopped = False
             if(self.playground.playBtPlay.isClick(pos)):
                 if not self.playground.stopped:
                     self.playground.initAnim()
                 self.playground.playing = True
+            if(self.playground.playBtFast.isClick(pos)):
+                if self.playground.destPlaySpeed < 16.0:
+                    self.playground.destPlaySpeed *= 2.0
             if(self.playground.playBtPause.isClick(pos)):
                 self.playground.playing = False
                 self.playground.stopped = True
+        if self.currentScreen == SCR_LEVELEND:
+            if(self.playground.endBtReplay.isClick(pos)):
+                self.currentScreen = TRANS_LEVELEND_EDIT
+                self.idleTransition = 0
+                self.offsetTransition = 0
+                self.playground.destPlaySpeed = 1.0
+                self.playground.playSpeed = 1.0
+                self.playground.playing = False
+                self.playground.stopped = False
+            if(self.playground.endBtLevels.isClick(pos)):
+                self.currentScreen = TRANS_LEVELEND_LEVEL
+                self.idleTransition = 0
+                self.offsetTransition = 0
+            if(self.playground.endBtNext.isClick(pos)):
+                nextLvlNum = self.playground.level.number + 1
+                nextLvl = self.manager.getLevelByNum(nextLvlNum)
+                if nextLvl:
+                    self.oldPlayground = self.playground
+                    self.makePreviewForLevel(nextLvlNum)
+                    self.currentScreen = TRANS_LEVELEND_EDITNEXT
+                    self.idleTransition = 0
+                    self.offsetTransition = 0
+                else:#get back to level selection for now
+                    self.currentScreen = TRANS_LEVELEND_LEVEL
+                    self.idleTransition = 0
+                    self.offsetTransition = 0
     
     def motion(self,pos):
         if self.currentScreen == SCR_EDIT:
@@ -214,15 +249,35 @@ class GameMenu:
             if self.updateTransition(-1):
                 self.currentScreen = SCR_LEVELS
         if self.currentScreen == TRANS_EDIT_PLAY:
-            if self.updateTransition(1):
+            if self.updateTransition():
                 self.currentScreen = SCR_PLAY
         if self.currentScreen == TRANS_PLAY_EDIT:
             if self.updateTransition(-1):
                 self.currentScreen = SCR_EDIT
+        if self.currentScreen == TRANS_PLAY_LEVELEND:
+            if self.updateTransition(-1):
+                self.currentScreen = SCR_LEVELEND
+        if self.currentScreen == TRANS_LEVELEND_EDIT:
+            if self.updateTransition():
+                self.currentScreen = SCR_EDIT
+        if self.currentScreen == TRANS_LEVELEND_LEVEL:
+            if self.updateTransition(-1):
+                self.currentScreen = SCR_LEVELS
+        if self.currentScreen == TRANS_LEVELEND_EDITNEXT:
+            if self.updateTransition():
+                self.currentScreen = SCR_EDIT
+                self.oldPlayground = None #clears out the old playground
         #playing field
         if self.currentScreen == SCR_PLAY:
             if self.playground.playing:
                 self.playground.tickPlay()
+                if self.playground.levelComplete:
+                    self.playground.destPlaySpeed = 1.0
+                    self.currentScreen = TRANS_PLAY_LEVELEND
+                    self.idleTransition = 0
+                    self.offsetTransition = 0
+        elif (self.currentScreen == TRANS_PLAY_LEVELEND or self.currentScreen == SCR_LEVELEND):
+            self.playground.tickPlay()
                 
     def updateTransition(self,m = 1): # m: positive or negative multiplier
         self.idleTransition += 1.0
@@ -253,6 +308,8 @@ class GameMenu:
             self.playground.drawEdit()
         if self.currentScreen == SCR_PLAY:
             self.playground.drawPlay()
+        if self.currentScreen == SCR_LEVELEND:
+            self.playground.drawPlay((0,0),-500,0)
 
         #menu<>level
         if self.currentScreen == TRANS_MENU_LEVEL:
@@ -286,6 +343,21 @@ class GameMenu:
             self.playground.drawPlay( ( 0 , 0 ) , self.offsetTransition)
         if self.currentScreen == TRANS_PLAY_EDIT:
             self.playground.drawPlay( ( 0 , 0 ) , self.offsetTransition - 500 )
+        #play>levelend
+        if self.currentScreen == TRANS_PLAY_LEVELEND:
+            self.playground.drawPlay( ( 0 , 0 ) , -500 , self.offsetTransition-500 )
+        #levelend>edit
+        if self.currentScreen == TRANS_LEVELEND_EDIT:
+            self.playground.drawPlay( ( 0 , 0 ) , -self.offsetTransition-500 , self.offsetTransition )
+        #levelend>level
+        if self.currentScreen == TRANS_LEVELEND_LEVEL:
+            self.playground.drawPlay( ( self.offsetTransition , 0 ) , -500 , 0 )
+            self.drawLevels(( self.offsetTransition-500 , 0 ))
+            self.drawTitle( ( self.offsetTransition-500 , 0 ))
+        #levelend>next level
+        if self.currentScreen == TRANS_LEVELEND_EDITNEXT:
+            self.oldPlayground.drawPlay( ( self.offsetTransition , 0 ) , -500 , 0 )
+            self.playground.drawEdit( ( self.offsetTransition+500 , 0 ) )
 
         #update screen
         pygame.display.flip()

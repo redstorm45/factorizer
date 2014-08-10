@@ -87,30 +87,74 @@ class Game:
         self.makeLvlSurf()
 
     def initPlayer(self):
-        #button textures
+        #making button textures
         surfPlay  = pygame.Surface( (40,40) , SRCALPHA)
+        surfFast  = pygame.Surface( (40,40) , SRCALPHA)
         surfPause = pygame.Surface( (40,40) , SRCALPHA)
         surfStop  = pygame.Surface( (40,40) , SRCALPHA)
-        pygame.draw.polygon( surfPlay  , (13,125,27) , [ (10,12.5) , (10,27.5) , (30,20) ] )
-        pygame.draw.polygon( surfPause , (11,83,145) , [ (10,10)   , (15,10) , (15,30) , (10,30) ] )
-        pygame.draw.polygon( surfPause , (11,83,145) , [ (30,10)   , (25,10) , (25,30) , (30,30) ] )
-        pygame.draw.polygon( surfStop  , (192,13,0)  , [ (10,10)   , (30,10)   , (30,30)   , (10,30) ] )
         
+        surfReplay  = pygame.Surface( (40,40) )
+        surfLevels  = pygame.Surface( (40,40) , SRCALPHA)
+        surfNext    = pygame.Surface( (40,40) , SRCALPHA)
+        #drawing on the button textures
+        pygame.draw.polygon( surfPlay  , (13,125,27) , [ (10,12)  , (10,28) , (30,20) ] )
+        pygame.draw.polygon( surfFast  , (13,125,27) , [ (8,13)   , (8,27)  , (20,20) ] )
+        pygame.draw.polygon( surfFast  , (13,125,27) , [ (20,13)  , (20,27) , (32,20) ] )
+        pygame.draw.polygon( surfPause , (11,83,145) , [ (10,10)  , (15,10) , (15,30) , (10,30) ] )
+        pygame.draw.polygon( surfPause , (11,83,145) , [ (30,10)  , (25,10) , (25,30) , (30,30) ] )
+        pygame.draw.polygon( surfStop  , (192,13,0)  , [ (10,10)  , (30,10) , (30,30) , (10,30) ] )
+        
+        surfReplay.fill( (180,180,180) )
+        pygame.draw.circle(  surfReplay , (11,118,244)  , (20,20) , 15 )
+        pygame.draw.circle(  surfReplay , (180,180,180) , (20,20) , 10 )
+        pygame.draw.polygon( surfReplay , (180,180,180) , [ (20,0)  , (40,0)  , (40,20) , (20,20) ] )
+        pygame.draw.polygon( surfReplay , (11,118,244)  , [ (20,2)  , (20,14) , (28,8)  ] )
+        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (8,7)   , (13,7)  , (13,12) , (8,12)  ] )
+        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (8,17)  , (13,17) , (13,22) , (8,22)  ] )
+        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (8,27)  , (13,27) , (13,32) , (8,32)  ] )
+        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (18,7)  , (30,7)  , (30,12) , (18,12) ] )
+        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (18,17) , (30,17) , (30,22) , (18,22) ] )
+        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (18,27) , (30,27) , (30,32) , (18,32) ] )
+        pygame.draw.polygon( surfNext   , (13,125,27)   , [ (25,10) , (30,10) , (30,30) , (25,30) ] )
+        pygame.draw.polygon( surfNext   , (13,125,27)   , [ (10,10) , (10,30) , (25,20) ] )
         #buttons
         self.playBtPlay  = button.Button( surfPlay, (180,180,180) , (50,50), 1.2 )
+        self.playBtFast  = button.Button( surfFast, (180,180,180) , (50,50), 1.2 )
         self.playBtPause = button.Button( surfPause, (180,180,180) , (50,50), 1.2 )
         self.playBtStop  = button.Button( surfStop, (180,180,180) , (50,50), 1.2 )
-        self.playBtPlay.pos = (120,420)
-        self.playBtPause.pos = (250,420)
-        self.playBtStop.pos = (380,420)
+        self.endBtReplay  = button.Button( surfReplay, (180,180,180) , (50,50), 1.2 , True , None )
+        self.endBtLevels  = button.Button( surfLevels, (180,180,180) , (50,50), 1.2 , True , None )
+        self.endBtNext  = button.Button( surfNext, (180,180,180) , (50,50), 1.2 , True , None )
+        self.playBtPlay.pos = (100,420)
+        self.playBtFast.pos = (200,420)
+        self.playBtPause.pos = (300,420)
+        self.playBtStop.pos = (400,420)
+        self.endBtReplay.pos = (120,420)
+        self.endBtLevels.pos = (250,420)
+        self.endBtNext.pos = (380,420)
         
         #variable
         self.playing = False
         self.stopped = False
+        self.playSpeed = 1.0
+        self.destPlaySpeed = 1.0
         
         #level : physic manager
         self.level.physicManager = boxPhysic.BoxPhysic(self.level)
         self.level.makeCellReference()
+        
+        #make the end level surface
+        self.endLvlSurf = pygame.Surface( (500,500) , SRCALPHA )
+        pygame.draw.polygon( self.endLvlSurf, (100,100,100) , [
+                              (40,40) , (460,40) , (460,480) , (40,480)
+                              ] )
+        self.endLvlSurf.lock()
+        for x in range(self.endLvlSurf.get_width()):
+            for y in range(self.endLvlSurf.get_height()):
+                r,g,b,a = self.endLvlSurf.get_at( (x,y) )
+                self.endLvlSurf.set_at( (x,y) , (r,g,b,a*0.5) )
+        self.endLvlSurf.unlock()
+                
         
     def makePreview(self):
         #fonts
@@ -222,7 +266,7 @@ class Game:
         self.editorLvlSurf = pygame.Surface( (400,400) , SRCALPHA) #level base is 350x350
         
         maxDim = max(self.level.height,self.level.width)
-        self.cellSize = int(350/maxDim) #round to integer as not to make holes between squares
+        self.cellSize = int(350/maxDim) #round to integer as to make less holes between tiles
 
         #add level surfaces
         for y in range(self.level.height):
@@ -239,7 +283,7 @@ class Game:
                     if levelCell.staticSurf:
                         self.editorLvlSurf.blit( levelCell.staticSurf , (xPos,yPos) )
                 elif self.selectedTool:
-                    if ( (x,y) == self.selectedTool.phantomPos):
+                    if ( (x,y) == self.selectedTool.phantomPos) and self.selectedTool.number > 0:
                         xOffset,yOffset = self.selectedTool.dispObject.offset
                         xPos = xOffset + 50 + self.cellSize*x
                         yPos = yOffset + 50 + self.cellSize*y
@@ -269,21 +313,24 @@ class Game:
             self.visibleTools[i].draw(self.window,offset)
     
     #draw the level (when it may be moving)
-    def drawPlay(self,offset=(0,0),iterate= -500):
+    def drawPlay(self,offset=(0,0),iterate= -500,iterateEnd= -500):
         #calculate all offsets
         xOff,yOff = offset
         offsetButtons = (xOff, yOff + iterate)
         offsetToolbar = (xOff, yOff - iterate)
-        offsetPlaybar = (xOff  + iterate + 500, yOff)
+        offsetPlaybar = (xOff  + iterate + iterateEnd + 1000, yOff)
         offsetLevel   = (xOff  + iterate/10 + 100, yOff)
+        offsetEnd     = (xOff ,yOff - iterateEnd )
         
         #draw buttons
         self.editorBtBack.draw(self.window,offsetButtons)
         self.editorBtTest.draw(self.window,offsetButtons)
         
-        self.playBtPlay.draw(self.window,offsetPlaybar)
-        self.playBtPause.draw(self.window,offsetPlaybar)
-        self.playBtStop.draw(self.window,offsetPlaybar)
+        if iterateEnd != 0:
+            self.playBtPlay.draw(self.window,offsetPlaybar)
+            self.playBtFast.draw(self.window,offsetPlaybar)
+            self.playBtPause.draw(self.window,offsetPlaybar)
+            self.playBtStop.draw(self.window,offsetPlaybar)
         
         #drawing the level
         for y in range(self.level.height):
@@ -307,14 +354,6 @@ class Game:
                     self.window.blit( drawnCell.baseSurf , (xPos,yPos) )
                     if drawnCell.animSurf:
                         self.window.blit( drawnCell.animSurf , (xPos,yPos) )
-                    #draw output tooltip
-                    if isinstance(drawnCell,cell.output.Output):
-                        for o in self.objectives:
-                            if o.pos == (x,y):
-                                xOffset,yOffset = o.offset
-                                xPos = xOffset + 50 + self.cellSize*x + xOffLvl
-                                yPos = yOffset + 50 + self.cellSize*y + yOffLvl
-                                self.window.blit( o.surf , (xPos,yPos) )
                 else:#empty cell
                     xPos = 50 + self.cellSize*x + xOffLvl
                     yPos = 50 + self.cellSize*y + yOffLvl
@@ -327,10 +366,30 @@ class Game:
             yPos = b.offset + 37.5 + self.cellSize*b.y + yOffLvl -1
             self.window.blit( b.surf , (xPos,yPos) )
         
+        
+        #draw output tooltip
+        for y in range(self.level.height):
+            for x in range(self.level.width):
+                xOffLvl,yOffLvl = offsetLevel
+                if isinstance(self.level.table[x][y],cell.output.Output):
+                    for o in self.objectives:
+                        if o.pos == (x,y):
+                            xOffset,yOffset = o.offset
+                            offProgress = int( self.cellSize*0.6*(1.0+(iterate+iterateEnd+500)/500.0))
+                            xPos = xOffset + 50 + self.cellSize*x + xOffLvl
+                            yPos = yOffset + 50 + self.cellSize*y + yOffLvl + offProgress
+                            self.window.blit( o.surf , (xPos,yPos) , (0,0,self.cellSize,int(self.cellSize*0.6 - offProgress)))
         #draw toolbar
         #TODO : make centered
         for i in range(len(self.visibleTools)):
             self.visibleTools[i].draw(self.window,offsetToolbar)
+            
+        #draw end screen
+        self.window.blit( self.endLvlSurf , offsetEnd )
+        
+        self.endBtReplay.draw(self.window,offsetEnd)
+        self.endBtLevels.draw(self.window,offsetEnd)
+        self.endBtNext.draw(self.window,offsetEnd)
     
     def getAdjCells(self,x,y):
         return [self.getCellAt(x+1,y),
@@ -359,17 +418,30 @@ class Game:
         #initialize objectives
         self.objectives = []
         for o in self.level.objectives:
-            self.objectives.append( objectiveTooltip.objectiveTooltip( self.getCellAt( *o[0] ) , self.cellSize) )
+            self.objectives.append( objectiveTooltip.objectiveTooltip( self.getCellAt( *o[0] ) , self.cellSize , o[1] ) )
     
     def tickPlay(self):
         #update animations
         for y in range(self.level.height):
             for x in range(self.level.width):
                 if isinstance(self.level.table[x][y],cell.cell.Cell):
-                    self.level.table[x][y].updateAnim()
+                    self.level.table[x][y].updateAnim(self.playSpeed)
         
         #update physics (of boxes)
-        self.level.physicManager.tickModel()
+        self.level.physicManager.tickModel(self.playSpeed)
+        
+        #check if the level is finished
+        self.levelComplete = True
+        for o in self.objectives:
+            if not o.complete:
+                self.levelComplete = False
+                
+        #update speed
+        diff = self.destPlaySpeed - self.playSpeed
+        if abs(diff) > 0.75:
+            diff = diff*0.75 /abs(diff)
+        self.playSpeed += diff / 10.0
+        
 
 
 
