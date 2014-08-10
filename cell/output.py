@@ -30,8 +30,7 @@ from pygame.locals import *
 import cell.cell
 import util
 import math
-
-colorBase = (175,175,175)
+import colors
 
 class Output(cell.cell.Cell):
     def __init__(self,infos):
@@ -84,18 +83,19 @@ class Output(cell.cell.Cell):
         pointsArrow = util.translatePoints( util.rotatePoints( baseArrowPoints , self.orient*math.pi/2 ) , (size/2,size/2) )
 
         #shadow inside the hole
-        pygame.draw.polygon( self.baseSurf , util.multColor(colorBase,0.8) , pointsHoleLeft )
-        pygame.draw.polygon( self.baseSurf , util.multColor(colorBase,0.5) , pointsHoleTop )
+        pygame.draw.polygon( self.baseSurf , colors.theColors.cellRight , pointsHoleLeft )
+        pygame.draw.polygon( self.baseSurf , colors.theColors.cellFront , pointsHoleTop )
         #draw the basic shape
-        pygame.draw.polygon( self.baseSurf , colorBase , pointsTop )
-        pygame.draw.polygon( self.baseSurf , util.multColor(colorBase,0.8) , pointsRight )
-        pygame.draw.polygon( self.baseSurf , util.multColor(colorBase,0.5) , pointsFront )
+        pygame.draw.polygon( self.baseSurf , colors.theColors.cellBase  , pointsTop )
+        pygame.draw.polygon( self.baseSurf , colors.theColors.cellRight , pointsRight )
+        pygame.draw.polygon( self.baseSurf , colors.theColors.cellFront , pointsFront )
         #draw inputting arrow
         if self.orient == -1:
             for i in range(4):
                 pointsArrow = util.translatePoints( util.rotatePoints( baseArrowPoints , i*math.pi/2 ) , (size/2,size/2) )
-                pygame.draw.polygon( self.baseSurf , util.multColor(colorBase,0.5) , pointsArrow )
-        pygame.draw.polygon( self.baseSurf , util.multColor(colorBase,0.5) , pointsArrow )
+                pygame.draw.polygon( self.baseSurf , colors.theColors.cellArrow , pointsArrow )
+        else:
+            pygame.draw.polygon( self.baseSurf , colors.theColors.cellArrow , pointsArrow )
 
     def draw(self,window,pos):
         window.blit( self.baseSurf , pos )

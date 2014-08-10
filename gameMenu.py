@@ -44,6 +44,7 @@ import button
 import math
 import levelManager
 import game
+import colors
 from pygame.locals import *
 
 SCR_MENU     = 0  #selection local game / challenge
@@ -66,14 +67,14 @@ TRANS_LEVELEND_EDIT     = 19
 TRANS_LEVELEND_LEVEL    = 20
 TRANS_LEVELEND_EDITNEXT = 21
 
-#transitions
-TRANS_PREV_EDIT = 2
+
 class GameMenu:
     def __init__(self):
         pygame.init()
         
         self.size = (500,500)
         self.currentScreen = SCR_MENU
+        self.color = colors.theColors
 
         self.manager = levelManager.LevelManager()
         self.manager.loadLevels()
@@ -85,17 +86,17 @@ class GameMenu:
         self.fontTitle = pygame.font.Font(None,60)
         self.fontButtons = pygame.font.Font(None,40)
         #generate texts
-        self.menuTitleSurf = self.fontTitle.render("MENU",True,(200,200,200))
-        self.menuTitleShad = self.fontTitle.render("MENU",True,(100,100,100))
-        menuTxtBtLvl = self.fontTitle.render("Levels",True,(50,50,50))
-        menuTxtBtChal = self.fontTitle.render("Challenges",True,(50,50,50))
-        menuTxtBtBack = self.fontButtons.render("Back",True,(50,50,50))
+        self.menuTitleSurf = self.fontTitle.render("MENU",True,self.color.titleFront)
+        self.menuTitleShad = self.fontTitle.render("MENU",True,self.color.titleShadow)
+        menuTxtBtLvl = self.fontTitle.render("Levels",True,self.color.textButtonMenu)
+        menuTxtBtChal = self.fontTitle.render("Challenges",True,self.color.textButtonMenu)
+        menuTxtBtBack = self.fontButtons.render("Back",True,self.color.textButtonMenu)
         #buttons
-        self.menuBtLvl = button.Button( menuTxtBtLvl , (180,180,180) , (350,75) , 1.05 )
-        self.menuBtChal= button.Button( menuTxtBtChal, (180,180,180) , (350,75), 1.05 )
+        self.menuBtLvl = button.Button( menuTxtBtLvl , self.color.buttonMenu , (350,75) , 1.05 )
+        self.menuBtChal= button.Button( menuTxtBtChal, self.color.buttonMenu , (350,75), 1.05 )
         self.menuBtLvl.pos = (250,175)
         self.menuBtChal.pos = (250,325)
-        self.menuBtBack= button.Button( menuTxtBtBack, (180,180,180) , (100,50), 1.15 )
+        self.menuBtBack= button.Button( menuTxtBtBack, self.color.buttonMenu , (100,50), 1.15 )
         self.menuBtBack.pos = (250,425)
         self.listBtLevels = []
         for y in range(4):
@@ -103,10 +104,10 @@ class GameMenu:
             for x in range(4):
                 if self.manager.levelNb >= 4*y + x + 1:
                     txt = str(4*y + x + 1)
-                    txtBt = self.fontButtons.render(txt,True,(50,50,50))
-                    color = (100,100,100)
+                    txtBt = self.fontButtons.render(txt,True,self.color.textButtonMenu)
+                    color = self.color.levelInnactive
                     if y <= 0:
-                        color = (250,250,250)
+                        color = self.color.levelActive
                     newButton = button.Button( txtBt , color , (50,50) , 1.25 )
                     newButton.pos = (130+80*x,100+80*y)
                     newButton.lvlNum = 4*y + x + 1
@@ -294,7 +295,7 @@ class GameMenu:
 
     def draw(self):
         #background
-        self.window.fill((50,50,50))
+        self.window.fill(self.color.background)
 
         if self.currentScreen == SCR_MENU:
             self.drawTitle()

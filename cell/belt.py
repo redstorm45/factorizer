@@ -30,8 +30,7 @@ import math
 from pygame.locals import *
 import cell.cell
 import util
-
-colorBase = (175,175,175)
+import colors
 
 class Belt(cell.cell.Cell):
     def __init__(self,infos):
@@ -68,12 +67,12 @@ class Belt(cell.cell.Cell):
             listArrowsPoints.append(arrow)
 
         #draw the basic shape
-        pygame.draw.polygon( self.baseSurf , colorBase , pointsTop )
-        pygame.draw.polygon( self.baseSurf , util.multColor(colorBase,0.8) , pointsRight )
-        pygame.draw.polygon( self.baseSurf , util.multColor(colorBase,0.5) , pointsFront )
+        pygame.draw.polygon( self.baseSurf , colors.theColors.cellBase  , pointsTop   )
+        pygame.draw.polygon( self.baseSurf , colors.theColors.cellRight , pointsRight )
+        pygame.draw.polygon( self.baseSurf , colors.theColors.cellFront , pointsFront )
         #draw outputting arrow
         for i in range(3):
-            pygame.draw.polygon( self.staticSurf , util.multColor(colorBase,0.5) , listArrowsPoints[i] )
+            pygame.draw.polygon( self.staticSurf , colors.theColors.cellArrow , listArrowsPoints[i] )
 
     def draw(self,window,pos):
         window.blit( self.baseSurf , pos )
@@ -124,7 +123,7 @@ class Belt(cell.cell.Cell):
             
         #drawing arrows
         for i in range(4):
-            pygame.draw.polygon( subSurf , util.multColor(colorBase,0.5) , listArrowsPoints[i] )
+            pygame.draw.polygon( subSurf , colors.theColors.cellArrow , listArrowsPoints[i] )
         
         #blitting
         subSize = int(size*(0.8 + 0.1*nextPresent + 0.1*prevPresent))+1

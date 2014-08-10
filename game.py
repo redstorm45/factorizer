@@ -41,6 +41,7 @@ import cell.input
 import cell.output
 import cell.belt
 import objectiveTooltip
+import colors
 from pygame.locals import *
 
 colorGround = (100,100,100)
@@ -50,17 +51,18 @@ class Game:
         self.window = pygame.display.get_surface()
         self.size = self.window.get_size()
         self.level = level
+        self.color = colors.theColors
 
     def initEditor(self):
         #fonts
         self.fontButtons = pygame.font.Font(None,20)
         #generate texts
-        textBtBack = self.fontButtons.render("Back",True,(50,50,50))
-        textBtTest = self.fontButtons.render("Test",True,(50,50,50))
+        textBtBack = self.fontButtons.render("Back",True,self.color.textButtonMenu)
+        textBtTest = self.fontButtons.render("Test",True,self.color.textButtonMenu)
         
         #make buttons
-        self.editorBtBack = button.Button( textBtBack, (180,180,180) , (75,30), 1.15 )
-        self.editorBtTest = button.Button( textBtTest, (230,230,230) , (75,30), 1.15 )
+        self.editorBtBack = button.Button( textBtBack, self.color.buttonMenu     , (75,30), 1.15 )
+        self.editorBtTest = button.Button( textBtTest, self.color.buttonMenuTest , (75,30), 1.15 )
         self.editorBtBack.pos = (60,75)
         self.editorBtTest.pos = (60,25)
         
@@ -97,41 +99,41 @@ class Game:
         surfLevels  = pygame.Surface( (40,40) , SRCALPHA)
         surfNext    = pygame.Surface( (40,40) , SRCALPHA)
         #drawing on the button textures
-        pygame.draw.polygon( surfPlay  , (13,125,27) , [ (10,12)  , (10,28) , (30,20) ] )
-        pygame.draw.polygon( surfFast  , (13,125,27) , [ (8,13)   , (8,27)  , (20,20) ] )
-        pygame.draw.polygon( surfFast  , (13,125,27) , [ (20,13)  , (20,27) , (32,20) ] )
-        pygame.draw.polygon( surfPause , (11,83,145) , [ (10,10)  , (15,10) , (15,30) , (10,30) ] )
-        pygame.draw.polygon( surfPause , (11,83,145) , [ (30,10)  , (25,10) , (25,30) , (30,30) ] )
+        pygame.draw.polygon( surfPlay  , self.color.playGreen , [ (10,12)  , (10,28) , (30,20) ] )
+        pygame.draw.polygon( surfFast  , self.color.playGreen , [ (8,13)   , (8,27)  , (20,20) ] )
+        pygame.draw.polygon( surfFast  , self.color.playGreen , [ (20,13)  , (20,27) , (32,20) ] )
+        pygame.draw.polygon( surfPause , self.color.playBlue  , [ (10,10)  , (15,10) , (15,30) , (10,30) ] )
+        pygame.draw.polygon( surfPause , self.color.playBlue  , [ (30,10)  , (25,10) , (25,30) , (30,30) ] )
         pygame.draw.polygon( surfStop  , (192,13,0)  , [ (10,10)  , (30,10) , (30,30) , (10,30) ] )
         
         surfReplay.fill( (180,180,180) )
-        pygame.draw.circle(  surfReplay , (11,118,244)  , (20,20) , 15 )
-        pygame.draw.circle(  surfReplay , (180,180,180) , (20,20) , 10 )
-        pygame.draw.polygon( surfReplay , (180,180,180) , [ (20,0)  , (40,0)  , (40,20) , (20,20) ] )
-        pygame.draw.polygon( surfReplay , (11,118,244)  , [ (20,2)  , (20,14) , (28,8)  ] )
-        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (8,7)   , (13,7)  , (13,12) , (8,12)  ] )
-        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (8,17)  , (13,17) , (13,22) , (8,22)  ] )
-        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (8,27)  , (13,27) , (13,32) , (8,32)  ] )
-        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (18,7)  , (30,7)  , (30,12) , (18,12) ] )
-        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (18,17) , (30,17) , (30,22) , (18,22) ] )
-        pygame.draw.polygon( surfLevels , (11,118,244)  , [ (18,27) , (30,27) , (30,32) , (18,32) ] )
-        pygame.draw.polygon( surfNext   , (13,125,27)   , [ (25,10) , (30,10) , (30,30) , (25,30) ] )
-        pygame.draw.polygon( surfNext   , (13,125,27)   , [ (10,10) , (10,30) , (25,20) ] )
+        pygame.draw.circle(  surfReplay , self.color.playBlue   , (20,20) , 15 )
+        pygame.draw.circle(  surfReplay , self.color.buttonMenu , (20,20) , 10 )
+        pygame.draw.polygon( surfReplay , self.color.buttonMenu , [ (20,0)  , (40,0)  , (40,20) , (20,20) ] )
+        pygame.draw.polygon( surfReplay , self.color.playBlue   , [ (20,2)  , (20,14) , (28,8)  ] )
+        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (8,7)   , (13,7)  , (13,12) , (8,12)  ] )
+        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (8,17)  , (13,17) , (13,22) , (8,22)  ] )
+        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (8,27)  , (13,27) , (13,32) , (8,32)  ] )
+        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (18,7)  , (30,7)  , (30,12) , (18,12) ] )
+        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (18,17) , (30,17) , (30,22) , (18,22) ] )
+        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (18,27) , (30,27) , (30,32) , (18,32) ] )
+        pygame.draw.polygon( surfNext   , self.color.playGreen  , [ (25,10) , (30,10) , (30,30) , (25,30) ] )
+        pygame.draw.polygon( surfNext   , self.color.playGreen  , [ (10,10) , (10,30) , (25,20) ] )
         #buttons
-        self.playBtPlay  = button.Button( surfPlay, (180,180,180) , (50,50), 1.2 )
-        self.playBtFast  = button.Button( surfFast, (180,180,180) , (50,50), 1.2 )
-        self.playBtPause = button.Button( surfPause, (180,180,180) , (50,50), 1.2 )
-        self.playBtStop  = button.Button( surfStop, (180,180,180) , (50,50), 1.2 )
-        self.endBtReplay  = button.Button( surfReplay, (180,180,180) , (50,50), 1.2 , True , None )
-        self.endBtLevels  = button.Button( surfLevels, (180,180,180) , (50,50), 1.2 , True , None )
-        self.endBtNext  = button.Button( surfNext, (180,180,180) , (50,50), 1.2 , True , None )
-        self.playBtPlay.pos = (100,420)
-        self.playBtFast.pos = (200,420)
+        self.playBtPlay  = button.Button( surfPlay  , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtFast  = button.Button( surfFast  , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtPause = button.Button( surfPause , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtStop  = button.Button( surfStop  , self.color.buttonMenu , (50,50), 1.2 )
+        self.endBtReplay = button.Button( surfReplay, self.color.buttonMenu , (50,50), 1.2 , True , None )
+        self.endBtLevels = button.Button( surfLevels, self.color.buttonMenu , (50,50), 1.2 , True , None )
+        self.endBtNext   = button.Button( surfNext  , self.color.buttonMenu , (50,50), 1.2 , True , None )
+        self.playBtPlay.pos  = (100,420)
+        self.playBtFast.pos  = (200,420)
         self.playBtPause.pos = (300,420)
-        self.playBtStop.pos = (400,420)
+        self.playBtStop.pos  = (400,420)
         self.endBtReplay.pos = (120,420)
         self.endBtLevels.pos = (250,420)
-        self.endBtNext.pos = (380,420)
+        self.endBtNext.pos   = (380,420)
         
         #variable
         self.playing = False
@@ -162,16 +164,16 @@ class Game:
         self.fontButtons = pygame.font.Font(None,30)
         #generate texts
         self.titleSurf = self.fontTitle.render(self.level.name,True,(200,200,200))
-        textBtBack = self.fontButtons.render("Back",True,(50,50,50))
-        textBtPlay = self.fontButtons.render("Play",True,(50,50,50))
+        textBtBack = self.fontButtons.render("Back",True,self.color.textButtonMenu)
+        textBtPlay = self.fontButtons.render("Play",True,self.color.textButtonMenu)
         #make buttons
-        self.previewBtBack = button.Button( textBtBack, (180,180,180) , (100,50), 1.15 )
-        self.previewBtPlay = button.Button( textBtPlay, (180,180,180) , (100,50), 1.15 )
+        self.previewBtBack = button.Button( textBtBack, self.color.buttonMenu , (100,50), 1.15 )
+        self.previewBtPlay = button.Button( textBtPlay, self.color.buttonMenu , (100,50), 1.15 )
         self.previewBtBack.pos = (75,200)
         self.previewBtPlay.pos = (75,300)
         #create surface
         self.preview = pygame.Surface( self.size )
-        self.preview.fill( (50,50,50) )
+        self.preview.fill( self.color.background )
         self.preview.blit( self.titleSurf , (50,50) )
 
         #make empty cell surface
