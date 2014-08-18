@@ -39,6 +39,7 @@ class Color:
         self.playBlue       = (11 ,83 ,145)
         
         self.cellBase       = (175,175,175)
+        self.cellBlock      = (175,175,175)
         self.cellRight      = (140,140,140)
         self.cellFront      = (87 ,87 ,87 )
         self.cellArrow      = (87 ,87 ,87 )

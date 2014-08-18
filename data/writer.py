@@ -33,8 +33,10 @@ for i in range(6):
             level.write("in(0,white,-1)\n") #input is white, direction 0, and standard
         elif i == 2 and j == 4:
             level.write("out(-1,any,1)\n")  #output is omnidirectionnal, accept any color, and is refered as output '1'
-        else:
+        elif i == 2 and (j==2 or j==3):
             level.write("n\n") #nothing
+        else:
+            level.write("b\n") #empty blocks
 level.write("1\n") #there is 1 objective
 level.write("1.10\n")#output '1' will need 10 cubes
 
