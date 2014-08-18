@@ -182,11 +182,6 @@ class Game:
         self.emptyCellSurf = pygame.Surface( (cellSize,cellSize) , SRCALPHA)
         emptyRect = pygame.Rect(int(0.1*cellSize),int(0.1*cellSize),int(0.9*cellSize),int(0.9*cellSize))
         pygame.draw.rect( self.emptyCellSurf, colorGround , emptyRect )
-        
-        #make blocked cell surface
-        blockTop = pygame.Surface( (cellSize*0.5,cellSize*0.5) , SRCALPHA)
-        blockButton = button.Button( blockTop , self.color.cellBlock , (cellSize*0.5,cellSize*0.5) , 1.25 )
-        self.blockCellSurf = blockButton.surf.copy()
 
         #add level surfaces
         for y in range(self.level.height):
@@ -199,10 +194,6 @@ class Game:
                     xPos = xOffset + 150 + cellSize*x
                     yPos = yOffset + 150 + cellSize*y
                     self.preview.blit( levelCell.baseSurf , (xPos,yPos) )
-                elif levelCell == 0:
-                    xPos = 150 + cellSize*x
-                    yPos = 150 + cellSize*y
-                    self.preview.blit( self.blockCellSurf , (xPos,yPos) )
                 else:#empty cell
                     xPos = 150 + cellSize*x
                     yPos = 150 + cellSize*y
@@ -303,10 +294,6 @@ class Game:
                         xPos = 50 + self.cellSize*x
                         yPos = 50 + self.cellSize*y
                         self.editorLvlSurf.blit( self.emptyCellSurf , (xPos,yPos) )
-                elif levelCell == 0:
-                    xPos = 50 + self.cellSize*(x-0.1)
-                    yPos = 50 + self.cellSize*(y-0.1)
-                    self.preview.blit( self.blockCellSurf , (xPos,yPos) )
                 else:#empty cell
                     xPos = 50 + self.cellSize*x
                     yPos = 50 + self.cellSize*y
@@ -351,27 +338,24 @@ class Game:
         for y in range(self.level.height):
             for x in range(self.level.width):
                 xOffLvl,yOffLvl = offsetLevel
-                levelCell = self.level.table[x][y]
                 if isinstance(self.level.table[x][y],cell.belt.Belt):
-                    levelCell.makeAnimSurf(self.cellSize,self.getAdjCells(x,y))
-                    xOffset,yOffset = levelCell.offset
+                    drawnCell = self.level.table[x][y]
+                    drawnCell.makeAnimSurf(self.cellSize,self.getAdjCells(x,y))
+                    xOffset,yOffset = drawnCell.offset
                     xPos = xOffset + 50 + self.cellSize*x + xOffLvl
                     yPos = yOffset + 50 + self.cellSize*y + yOffLvl
-                    self.window.blit( levelCell.baseSurf , (xPos,yPos) )
-                    if levelCell.animSurf:
-                        self.window.blit( levelCell.animSurf , (xPos,yPos) )
+                    self.window.blit( drawnCell.baseSurf , (xPos,yPos) )
+                    if drawnCell.animSurf:
+                        self.window.blit( drawnCell.animSurf , (xPos,yPos) )
                 elif isinstance(self.level.table[x][y],cell.cell.Cell):
-                    levelCell.makeAnimSurf(self.cellSize)
-                    xOffset,yOffset = levelCell.offset
+                    drawnCell = self.level.table[x][y]
+                    drawnCell.makeAnimSurf(self.cellSize)
+                    xOffset,yOffset = drawnCell.offset
                     xPos = xOffset + 50 + self.cellSize*x + xOffLvl
                     yPos = yOffset + 50 + self.cellSize*y + yOffLvl
-                    self.window.blit( levelCell.baseSurf , (xPos,yPos) )
-                    if levelCell.animSurf:
-                        self.window.blit( levelCell.animSurf , (xPos,yPos) )
-                elif levelCell == 0:
-                    xPos = 50 + self.cellSize*(x-0.1) + xOffLvl
-                    yPos = 50 + self.cellSize*(y-0.1) + yOffLvl
-                    self.preview.blit( self.blockCellSurf , (xPos,yPos) )
+                    self.window.blit( drawnCell.baseSurf , (xPos,yPos) )
+                    if drawnCell.animSurf:
+                        self.window.blit( drawnCell.animSurf , (xPos,yPos) )
                 else:#empty cell
                     xPos = 50 + self.cellSize*x + xOffLvl
                     yPos = 50 + self.cellSize*y + yOffLvl

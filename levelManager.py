@@ -106,8 +106,6 @@ class LevelManager:
         try:
             if data == "n":
                 return None
-            elif data == "b":
-                return 0
             elif data[0:2] == "in":
                 opt = data[3:].strip(")").split(",")
                 c = cell.input.Input(opt)
