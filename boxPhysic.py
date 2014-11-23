@@ -66,28 +66,50 @@ class BoxPhysic:
     def singleTick(self):
         #output boxes
         for b in self.listBoxes:
-            theCell = self.level.table[int(b.x)][int(b.y)]
-            #make the box disapear in an output
-            if isinstance(theCell , cell.output.Output):
-                xMid = int(b.x) + 0.5
-                yMid = int(b.y) + 0.5
-                
-                if ( abs(b.x-xMid) < 0.02 and abs(b.y-yMid) < 0.02 ):#box is 1 iteration to the output
-                    #give box to the output
-                    theCell.takeBox(b)
-                    self.listBoxes.remove(b)
+            theCell = None
+            if int(b.x) in range(self.level.width) and int(b.y) in range(self.level.height):
+                theCell = self.level.table[int(b.x)][int(b.y)]
+                #make the box disapear in an output
+                if isinstance(theCell , cell.output.Output):
+                    xMid = int(b.x) + 0.5
+                    yMid = int(b.y) + 0.5
+                    
+                    if ( abs(b.x-xMid) < 0.02 and abs(b.y-yMid) < 0.02 ):#box is 1 iteration to the output
+                        #give box to the output
+                        theCell.takeBox(b)
+                        self.listBoxes.remove(b)
             #the box falls in the void
             if not theCell:
-                xMid = int(b.x) + 0.5
-                yMid = int(b.y) + 0.5
-                if ( abs(b.x-xMid) <= 0.28 and abs(b.y-yMid) <= 0.28 ):
-                    try:
-                        b.fallIter -= 1
-                        if b.fallIter <= 0:
-                            self.listBoxes.remove(b)
-                    except AttributeError:
+                xDim , yDim = (2 , 2)
+                
+                #only select cells which the box is on
+                if (abs(b.x-int(b.x)) > 0.25) and (abs(b.x-int(b.x+1)) > 0.25): #not near line
+                    xDim = 1
+                if (abs(b.y-int(b.y)) > 0.25) and (abs(b.y-int(b.y+1)) > 0.25):
+                    yDim = 1
+                    
+                #try to get adjacent cells
+                adjCells = [[None,None],[None,None]]
+                for x in range(xDim):
+                    xCell = int(b.x-0.25)+x
+                    for y in range(yDim):
+                        yCell = int(b.y-0.25)+y
+                        if xCell in range(self.level.width) and yCell in range(self.level.height):
+                            adjCells[x][y] = self.level.table[xCell][yCell]
+                
+                #check for every present cell if the box is on it
+                onSthg = False
+                for row in adjCells:
+                    for c in row:
+                        if c:
+                            onSthg = True
+                
+                #TODO : finish check for cell presence under box
+                
+                if ( not onSthg ):
+                    if not b.falling:
                         b.falling = True
-                        b.fallIter = 30
+                        b.fallIter = 30 
         
         #get each box's applied force
         for b in self.listBoxes:
@@ -104,7 +126,9 @@ class BoxPhysic:
                     yCell = int(posBox.top+j)
                     
                     #extract the cell
-                    theCell = self.level.table[xCell][yCell]
+                    theCell = None
+                    if xCell in range(self.level.width) and yCell in range(self.level.height):
+                        theCell = self.level.table[xCell][yCell]
                     
                     force = (0,0)
                     if theCell:
@@ -127,17 +151,87 @@ class BoxPhysic:
                         totalForceX += forceX
                         totalForceY += forceY
             
-            b.baseForce = (totalForceX , totalForceY)
+            #make the speed tend to these numbers
+            diffx = totalForceX*0.2 - b.velx
+            diffy = totalForceY*0.2 - b.vely
+            
+            if abs(diffx) > 0.5:
+                diffx = diffx/abs(diffx)*0.5
+            if abs(diffy) > 0.5:
+                diffy = diffy/abs(diffy)*0.5
+            b.baseForce = (diffx,diffy)
         
-        #TODO : add here a test for collisions
+        #IN PROGRESS : adding a collision test for boxes
+        
+        self.checkCollisions()
         
         #apply resulting force to the box
         for b in self.listBoxes:
-            if hasattr( b , 'falling' ):
-                b.makeSurf( b.fallIter / 30.0 )
-            fx,fy = b.baseForce
-            b.x += fx*0.02
-            b.y += fy*0.02
+            if b.falling:
+                b.fallIter -= 1
+                if b.fallIter >0:
+                    b.makeSurf( b.fallIter / 30.0 )
+                else:
+                    self.listBoxes.remove(b)
+            else:
+                fx,fy = b.baseForce
+                b.velx *= 0.9
+                b.vely *= 0.9
+                b.velx += fx*0.02  #0.02 = 1/50 = multiplier for 1 frame -> 1 s
+                b.vely += fy*0.02
+                
+                b.x += b.velx
+                b.y += b.vely
+        
+        #set display order for the boxes
+        self.displaySort()
+    
+    def checkCollisions(self):
+        #step 1: detect collisions
+        collisions = []
+        for b1 in self.listBoxes:
+            for b2 in self.listBoxes:
+                c1 = b1 != b2 and (not (b2,b1) in collisions )                    #not taking 2 times the same
+                c2 = b1.squareDist(b2) < 2                                        #only take boxes near each other
+                c3 = not (b1.falling or b2.falling)  #check not taking a falling box
+                if c1 and c2 and c3:
+                    r1 = rect.Rect( (b1.x-0.25,b1.y-0.25) , (0.5,0.5) )
+                    r2 = rect.Rect( (b2.x-0.25,b2.y-0.25) , (0.5,0.5) )
+                    if r1.hasCommonPoint(r2):
+                        collisions.append( (b1,b2) )
+        
+        #step 2: add impulse to them
+        # hyp : mass are all equals to 1
+        for pair in collisions:
+            #get data
+            b1,b2 = pair
+            r1 = rect.Rect( (b1.x-0.25,b1.y-0.25) , (0.5,0.5) )
+            r2 = rect.Rect( (b2.x-0.25,b2.y-0.25) , (0.5,0.5) )
+            intersect = r1.intersect(r2)
+            
+            #get smaller dimension
+            little = 1 #width
+            if intersect.w > intersect.h:
+                little = 2 #height
+            
+            #build impulse
+            impulse = 40*min(intersect.w,intersect.h)
+            
+            #limit impulse
+            if abs(impulse)>0.2:
+                impulse= (impulse/abs(impulse))*0.2
+            
+            #apply to velocities
+            b1x,b1y = b1.baseForce
+            b2x,b2y = b2.baseForce
+            if little == 1:
+                b2x += impulse
+                b1x -= impulse
+            else:
+                b2y += impulse
+                b1y -= impulse
+            b1.baseForce = (b1x,b1y)
+            b2.baseForce = (b2x,b2y)
             
     def getActionRect(self,c):
         #belt (cropped edges)
@@ -200,6 +294,25 @@ class BoxPhysic:
         #making a copy of the force
         x,y = c.force
         return (x+0,y+0)
+    
+    def displaySort(self):#this function will sort boxes for display
+        sortDone = 0
+        while (not self.boxSorted()) and (sortDone<len(self.listBoxes)):
+            sortDone += 1
+            for i in range(len(self.listBoxes)-sortDone):
+                b1 = self.listBoxes[i]
+                b2 = self.listBoxes[i+1]
+                if b1.x+b1.y > b2.x+b2.y:
+                    self.listBoxes[i]   = b2
+                    self.listBoxes[i+1] = b1
+    
+    def boxSorted(self):
+        for i in range(len(self.listBoxes)-1):
+            b1 = self.listBoxes[i]
+            b2 = self.listBoxes[i+1]
+            if b1.x+b1.y > b2.x+b2.y:
+                return False
+        return True
     
     def addBox(self,added):
         self.listBoxes.append(added)

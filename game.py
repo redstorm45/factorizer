@@ -79,6 +79,7 @@ class Game:
             self.visibleTools[i].drawPos = (100 + 75*i,415)
             
         #make tool object surfaces
+        # TODO : only load these textures once
         maxDim = max(self.level.height,self.level.width)
         cellSize = 350/maxDim
         for t in self.listTools:

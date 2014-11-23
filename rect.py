@@ -60,8 +60,8 @@ class Rect:
         if not self.hasCommonPoint(r):
             return Rect((self.left,self.top),(0,0))
         top = max( r.top , self.top )
-        left = max( r.left , self.left )
         bottom = min( r.bottom , self.bottom )
+        left = max( r.left , self.left )
         right = min( r.right , self.right )
         
         return Rect((left,top),(right-left , bottom-top ))
