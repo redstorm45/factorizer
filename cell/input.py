@@ -31,7 +31,7 @@ from pygame.locals import *
 import cell.cell
 import box.box
 import util
-import colors
+import graphics.colors as colors
 
 class Input(cell.cell.Cell):
     def __init__(self,infos):

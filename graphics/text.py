@@ -20,29 +20,22 @@
 
 
     Description:
-        This class contains all the colors
+        This file can create textures of text, for use in buttons for example
+        
 '''
 
+import globalVars as g
 
-
-class Color:
-    def __init__(self):
-        self.background     = (50 ,50 ,50 )
-        self.levelActive    = (250,250,250)
-        self.levelInnactive = (100,100,100)
-        self.buttonMenu     = (180,180,180)
-        self.buttonMenuTest = (230,230,230)
-        self.textButtonMenu = (50 ,50 ,50 )
-        self.titleFront     = (200,200,200)
-        self.titleShadow    = (100,100,100)
-        self.playGreen      = (13 ,125,27 )
-        self.playBlue       = (11 ,83 ,145)
-        
-        self.cellBase       = (175,175,175)
-        self.cellRight      = (140,140,140)
-        self.cellFront      = (87 ,87 ,87 )
-        self.cellArrow      = (87 ,87 ,87 )
-
-theColors = Color()
-        
-        
+#
+# first argument is the name of the font
+# second argument is the text to write
+def createText(self):
+    color = None
+    try:
+        color = self.links[2]
+    except:
+        color = g.color.textButtonMenu
+    self.surf = g.tManager.fonts[self.links[0]].render(self.links[1],True,color)
+    
+    
+    

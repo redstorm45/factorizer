@@ -43,9 +43,15 @@ import pygame
 import button
 import math
 import levelManager
+import graphics.textureManager as textureManager
+import graphics.texture as texture
+import graphics.menu
+import graphics.text
 import game
-import colors
+import graphics.colors as colors
+import globalVars as g
 from pygame.locals import *
+
 
 SCR_MENU     = 0  #selection local game / challenge
 SCR_LEVELS   = 1  #selection of local levels
@@ -72,43 +78,59 @@ class GameMenu:
     def __init__(self):
         pygame.init()
         
+        theMenu = self
+        
         self.size = (500,500)
         self.currentScreen = SCR_MENU
-        self.color = colors.theColors
+        
+        g.color = graphics.colors.theColors
+        g.tManager = textureManager.TextureManager()
 
-        self.manager = levelManager.LevelManager()
-        self.manager.loadLevels()
+        g.lManager = levelManager.LevelManager()
+        g.lManager.loadLevels()
         
         self.initMenu()
 
     def initMenu(self):
+        print("managers : ",g.tManager,g.lManager)
         #fonts
-        self.fontTitle = pygame.font.Font(None,60)
-        self.fontButtons = pygame.font.Font(None,40)
+        g.tManager.addFont("title"    ,None,60)
+        g.tManager.addFont("xlButtons",None,50) #extra large buttons
+        g.tManager.addFont("lButtons" ,None,40) #large buttons
+        g.tManager.addFont("mButtons" ,None,30) #medium buttons
+        g.tManager.addFont("sButtons" ,None,20) #small buttons
         #generate texts
-        self.menuTitleSurf = self.fontTitle.render("MENU",True,self.color.titleFront)
-        self.menuTitleShad = self.fontTitle.render("MENU",True,self.color.titleShadow)
-        menuTxtBtLvl = self.fontTitle.render("Levels",True,self.color.textButtonMenu)
-        menuTxtBtChal = self.fontTitle.render("Challenges",True,self.color.textButtonMenu)
-        menuTxtBtBack = self.fontButtons.render("Back",True,self.color.textButtonMenu)
+        g.tManager.addTexture( { "name" : "menu.title"     ,
+                               "create" : graphics.menu.createTitle } )
+        g.tManager.addTexture( { "name" : "menu.btTxt.lvl" ,
+                               "create" : graphics.text.createText ,
+                               "temp" : True , "links" : ["title","Levels"] } )
+        g.tManager.addTexture( { "name" : "menu.btTxt.chal" ,
+                               "create" : graphics.text.createText ,
+                               "temp" : True , "links" : ["title","Challenges"] } )
+        g.tManager.addTexture( { "name" : "menu.btTxt.back" ,
+                               "create" : graphics.text.createText ,
+                               "temp" : True , "links" : ["lButtons","Back"] } )
         #buttons
-        self.menuBtLvl = button.Button( menuTxtBtLvl , self.color.buttonMenu , (350,75) , 1.05 )
-        self.menuBtChal= button.Button( menuTxtBtChal, self.color.buttonMenu , (350,75), 1.05 )
+        self.menuBtLvl = button.Button( "menu.btTxt.lvl"  , g.color.buttonMenu , (350,75) , 1.05 )
+        self.menuBtChal= button.Button( "menu.btTxt.chal" , g.color.buttonMenu , (350,75), 1.05 )
         self.menuBtLvl.pos = (250,175)
         self.menuBtChal.pos = (250,325)
-        self.menuBtBack= button.Button( menuTxtBtBack, self.color.buttonMenu , (100,50), 1.15 )
+        self.menuBtBack= button.Button( "menu.btTxt.back" , g.color.buttonMenu , (100,50), 1.15 )
         self.menuBtBack.pos = (250,425)
         self.listBtLevels = []
         for y in range(4):
             lvlLine = []
             for x in range(4):
-                if self.manager.levelNb >= 4*y + x + 1:
+                if g.lManager.levelNb >= 4*y + x + 1:
                     txt = str(4*y + x + 1)
-                    txtBt = self.fontButtons.render(txt,True,self.color.textButtonMenu)
-                    color = self.color.levelInnactive
+                    g.tManager.addTexture( { "name" : "menu.lvlBt."+txt ,
+                                           "create" : graphics.text.createText ,
+                                           "temp" : True , "links" : ["lButtons",txt] } )
+                    color = g.color.levelInnactive
                     if y <= 0:
-                        color = self.color.levelActive
-                    newButton = button.Button( txtBt , color , (50,50) , 1.25 )
+                        color = g.color.levelActive
+                    newButton = button.Button( "menu.lvlBt."+txt , color , (50,50) , 1.25 )
                     newButton.pos = (130+80*x,100+80*y)
                     newButton.lvlNum = 4*y + x + 1
                     lvlLine.append( newButton )
@@ -213,7 +235,7 @@ class GameMenu:
                 self.offsetTransition = 0
             if(self.playground.endBtNext.isClick(pos)):
                 nextLvlNum = self.playground.level.number + 1
-                nextLvl = self.manager.getLevelByNum(nextLvlNum)
+                nextLvl = g.lManager.getLevelByNum(nextLvlNum)
                 if nextLvl:
                     self.oldPlayground = self.playground
                     self.makePreviewForLevel(nextLvlNum)
@@ -287,7 +309,7 @@ class GameMenu:
         return self.idleTransition >= 75
     
     def makePreviewForLevel(self,levelNum):
-        level = self.manager.levelList[levelNum -1]
+        level = g.lManager.levelList[levelNum -1]
         self.playground = game.Game(level)
         self.playground.makePreview()
         self.playground.initEditor()
@@ -295,7 +317,7 @@ class GameMenu:
 
     def draw(self):
         #background
-        self.window.fill(self.color.background)
+        self.window.fill(g.color.background)
 
         if self.currentScreen == SCR_MENU:
             self.drawTitle()
@@ -365,8 +387,7 @@ class GameMenu:
 
     def drawTitle(self,offset = (0,0)):
         xOff , yOff =offset
-        self.window.blit( self.menuTitleShad, (188+xOff,53+yOff) )
-        self.window.blit( self.menuTitleSurf, (185+xOff,50+yOff) )
+        g.tManager.blit( self.window , "menu.title" , (185+xOff,50+yOff) )
 
     def drawMenu(self,offset = (0,0)):
         #boutons

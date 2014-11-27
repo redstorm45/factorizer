@@ -41,7 +41,10 @@ import cell.input
 import cell.output
 import cell.belt
 import objectiveTooltip
-import colors
+import graphics.colors as colors
+import graphics.game
+import graphics.text
+import globalVars as g
 from pygame.locals import *
 
 colorGround = (100,100,100)
@@ -54,15 +57,17 @@ class Game:
         self.color = colors.theColors
 
     def initEditor(self):
-        #fonts
-        self.fontButtons = pygame.font.Font(None,20)
         #generate texts
-        textBtBack = self.fontButtons.render("Back",True,self.color.textButtonMenu)
-        textBtTest = self.fontButtons.render("Test",True,self.color.textButtonMenu)
+        g.tManager.addTexture( { "name" : "editor.btText.back" ,
+                                 "create" : graphics.text.createText ,
+                                 "temp" : True , "links" : ["sButtons","Back"] } )
+        g.tManager.addTexture( { "name" : "editor.btText.test" ,
+                                 "create" : graphics.text.createText ,
+                                 "temp" : True , "links" : ["sButtons","Test"] } )
         
         #make buttons
-        self.editorBtBack = button.Button( textBtBack, self.color.buttonMenu     , (75,30), 1.15 )
-        self.editorBtTest = button.Button( textBtTest, self.color.buttonMenuTest , (75,30), 1.15 )
+        self.editorBtBack = button.Button( "editor.btText.back" , self.color.buttonMenu     , (75,30), 1.15 )
+        self.editorBtTest = button.Button( "editor.btText.test" , self.color.buttonMenuTest , (75,30), 1.15 )
         self.editorBtBack.pos = (60,75)
         self.editorBtTest.pos = (60,25)
         
@@ -79,7 +84,6 @@ class Game:
             self.visibleTools[i].drawPos = (100 + 75*i,415)
             
         #make tool object surfaces
-        # TODO : only load these textures once
         maxDim = max(self.level.height,self.level.width)
         cellSize = 350/maxDim
         for t in self.listTools:
@@ -90,44 +94,38 @@ class Game:
         self.makeLvlSurf()
 
     def initPlayer(self):
+        global g
         #making button textures
-        surfPlay  = pygame.Surface( (40,40) , SRCALPHA)
-        surfFast  = pygame.Surface( (40,40) , SRCALPHA)
-        surfPause = pygame.Surface( (40,40) , SRCALPHA)
-        surfStop  = pygame.Surface( (40,40) , SRCALPHA)
+        g.tManager.addTexture( { "name" : "editor.btTx.play" ,
+                                 "create" : graphics.game.createBtPlayTx ,
+                                 "temp" : True} )
+        g.tManager.addTexture( { "name" : "editor.btTx.fast" ,
+                                 "create" : graphics.game.createBtFastTx ,
+                                 "temp" : True} )
+        g.tManager.addTexture( { "name" : "editor.btTx.pause" ,
+                                 "create" : graphics.game.createBtPauseTx ,
+                                 "temp" : True} )
+        g.tManager.addTexture( { "name" : "editor.btTx.stop" ,
+                                 "create" : graphics.game.createBtStopTx ,
+                                 "temp" : True} )
+        g.tManager.addTexture( { "name" : "player.btTx.replay" ,
+                                 "create" : graphics.game.createBtReplayTx ,
+                                 "temp" : True} )
+        g.tManager.addTexture( { "name" : "player.btTx.levels" ,
+                                 "create" : graphics.game.createBtLevelsTx ,
+                                 "temp" : True} )
+        g.tManager.addTexture( { "name" : "player.btTx.next" ,
+                                 "create" : graphics.game.createBtNextTx ,
+                                 "temp" : True} )
         
-        surfReplay  = pygame.Surface( (40,40) )
-        surfLevels  = pygame.Surface( (40,40) , SRCALPHA)
-        surfNext    = pygame.Surface( (40,40) , SRCALPHA)
-        #drawing on the button textures
-        pygame.draw.polygon( surfPlay  , self.color.playGreen , [ (10,12)  , (10,28) , (30,20) ] )
-        pygame.draw.polygon( surfFast  , self.color.playGreen , [ (8,13)   , (8,27)  , (20,20) ] )
-        pygame.draw.polygon( surfFast  , self.color.playGreen , [ (20,13)  , (20,27) , (32,20) ] )
-        pygame.draw.polygon( surfPause , self.color.playBlue  , [ (10,10)  , (15,10) , (15,30) , (10,30) ] )
-        pygame.draw.polygon( surfPause , self.color.playBlue  , [ (30,10)  , (25,10) , (25,30) , (30,30) ] )
-        pygame.draw.polygon( surfStop  , (192,13,0)  , [ (10,10)  , (30,10) , (30,30) , (10,30) ] )
-        
-        surfReplay.fill( (180,180,180) )
-        pygame.draw.circle(  surfReplay , self.color.playBlue   , (20,20) , 15 )
-        pygame.draw.circle(  surfReplay , self.color.buttonMenu , (20,20) , 10 )
-        pygame.draw.polygon( surfReplay , self.color.buttonMenu , [ (20,0)  , (40,0)  , (40,20) , (20,20) ] )
-        pygame.draw.polygon( surfReplay , self.color.playBlue   , [ (20,2)  , (20,14) , (28,8)  ] )
-        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (8,7)   , (13,7)  , (13,12) , (8,12)  ] )
-        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (8,17)  , (13,17) , (13,22) , (8,22)  ] )
-        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (8,27)  , (13,27) , (13,32) , (8,32)  ] )
-        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (18,7)  , (30,7)  , (30,12) , (18,12) ] )
-        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (18,17) , (30,17) , (30,22) , (18,22) ] )
-        pygame.draw.polygon( surfLevels , self.color.playBlue   , [ (18,27) , (30,27) , (30,32) , (18,32) ] )
-        pygame.draw.polygon( surfNext   , self.color.playGreen  , [ (25,10) , (30,10) , (30,30) , (25,30) ] )
-        pygame.draw.polygon( surfNext   , self.color.playGreen  , [ (10,10) , (10,30) , (25,20) ] )
         #buttons
-        self.playBtPlay  = button.Button( surfPlay  , self.color.buttonMenu , (50,50), 1.2 )
-        self.playBtFast  = button.Button( surfFast  , self.color.buttonMenu , (50,50), 1.2 )
-        self.playBtPause = button.Button( surfPause , self.color.buttonMenu , (50,50), 1.2 )
-        self.playBtStop  = button.Button( surfStop  , self.color.buttonMenu , (50,50), 1.2 )
-        self.endBtReplay = button.Button( surfReplay, self.color.buttonMenu , (50,50), 1.2 , True , None )
-        self.endBtLevels = button.Button( surfLevels, self.color.buttonMenu , (50,50), 1.2 , True , None )
-        self.endBtNext   = button.Button( surfNext  , self.color.buttonMenu , (50,50), 1.2 , True , None )
+        self.playBtPlay  = button.Button( "editor.btTx.play"   , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtFast  = button.Button( "editor.btTx.fast"   , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtPause = button.Button( "editor.btTx.pause"  , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtStop  = button.Button( "editor.btTx.stop"   , self.color.buttonMenu , (50,50), 1.2 )
+        self.endBtReplay = button.Button( "player.btTx.replay" , self.color.buttonMenu , (50,50), 1.2 , True , None )
+        self.endBtLevels = button.Button( "player.btTx.levels" , self.color.buttonMenu , (50,50), 1.2 , True , None )
+        self.endBtNext   = button.Button( "player.btTx.next"   , self.color.buttonMenu , (50,50), 1.2 , True , None )
         self.playBtPlay.pos  = (100,420)
         self.playBtFast.pos  = (200,420)
         self.playBtPause.pos = (300,420)
@@ -154,28 +152,35 @@ class Game:
         self.endLvlSurf.lock()
         for x in range(self.endLvlSurf.get_width()):
             for y in range(self.endLvlSurf.get_height()):
-                r,g,b,a = self.endLvlSurf.get_at( (x,y) )
-                self.endLvlSurf.set_at( (x,y) , (r,g,b,a*0.5) )
+                red,green,blue,a = self.endLvlSurf.get_at( (x,y) )
+                self.endLvlSurf.set_at( (x,y) , (red,green,blue,a*0.5) )
         self.endLvlSurf.unlock()
                 
         
     def makePreview(self):
+        global g
         #fonts
         self.fontTitle = pygame.font.Font(None,50)
         self.fontButtons = pygame.font.Font(None,30)
         #generate texts
-        self.titleSurf = self.fontTitle.render(self.level.name,True,(200,200,200))
-        textBtBack = self.fontButtons.render("Back",True,self.color.textButtonMenu)
-        textBtPlay = self.fontButtons.render("Play",True,self.color.textButtonMenu)
+        g.tManager.addTexture( { "name" : "preview.levelTitle" ,
+                                 "create" : graphics.text.createText ,
+                                 "temp" : True , "links" : ["xlButtons",self.level.name,g.color.titleFront] } )
+        g.tManager.addTexture( { "name" : "preview.btText.back" ,
+                                 "create" : graphics.text.createText ,
+                                 "temp" : True , "links" : ["mButtons","Back"] } )
+        g.tManager.addTexture( { "name" : "preview.btText.play" ,
+                                 "create" : graphics.text.createText ,
+                                 "temp" : True , "links" : ["mButtons","Play"] } )
         #make buttons
-        self.previewBtBack = button.Button( textBtBack, self.color.buttonMenu , (100,50), 1.15 )
-        self.previewBtPlay = button.Button( textBtPlay, self.color.buttonMenu , (100,50), 1.15 )
+        self.previewBtBack = button.Button( "preview.btText.back" , self.color.buttonMenu , (100,50), 1.15 )
+        self.previewBtPlay = button.Button( "preview.btText.play" , self.color.buttonMenu , (100,50), 1.15 )
         self.previewBtBack.pos = (75,200)
         self.previewBtPlay.pos = (75,300)
         #create surface
         self.preview = pygame.Surface( self.size )
         self.preview.fill( self.color.background )
-        self.preview.blit( self.titleSurf , (50,50) )
+        g.tManager.blit( self.preview , "preview.levelTitle" , (50,50) )
 
         #make empty cell surface
         maxDim = max(self.level.height,self.level.width)

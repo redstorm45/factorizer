@@ -24,6 +24,8 @@
 
 import pygame
 import util
+import graphics.button
+import globalVars as g
 from pygame.locals import *
 
 class Button:
@@ -33,14 +35,18 @@ class Button:
             return
         if depthRatio < 1:
             depthRatio = 1.1
-
+        
         self.textSurf = textSurf
+        self.textName = "BT."+textSurf
         self.color = color
         self.backColor = backColor
+        insideSurf = g.tManager.get(textSurf).surf
+        
         #get the size of inside rect
         inW , inH = inSize
-        inW = max(inW,textSurf.get_width())
-        inH = max(inH,textSurf.get_height())
+        inW = max(inW,insideSurf.get_width())
+        inH = max(inH,insideSurf.get_height())
+        
         #get the size of outside rect
         outW = inW
         outH = inH
@@ -59,43 +65,24 @@ class Button:
         self.size = (outW,outH)
         self.inW = inW
         self.inH = inH
+        
         #generate vertex list
         self.middle = [ (0,0)   , (inW,0)   , (inW,inH) , (0,inH)]
         self.bottom = [ (0,inH) , (inW,inH)   , (outW,outH) , (outW-inW,outH)]
         self.right  = [ (inW,0) , (inW,inH) , (outW,outH)  , (outW,outH-inH)]
 
-        #generate surface
-        self.regenSurf()
-
-    def regenSurf(self,color = None):
-        if not color:
-            color = self.color
-        #generate colors
-        colorBot = util.multColor(color,0.5)
-        colorRig = util.multColor(color,0.8)
-        #make surface
-        surf = pygame.Surface( self.size )
-        if self.backColor:
-            surf.fill( self.backColor )
-        else:
-            surf = pygame.Surface( self.size , SRCALPHA )
-        #add polygons
-        pygame.draw.polygon( surf,color   ,self.middle )
-        pygame.draw.polygon( surf,colorBot,self.bottom )
-        pygame.draw.polygon( surf,colorRig,self.right  )
-        #add text
-        difX = self.inW - self.textSurf.get_width()
-        difY = self.inH - self.textSurf.get_height()
-        surf.blit( self.textSurf, (difX / 2 , difY / 2) )
-
-        self.surf = surf
+        #create the texture
+        g.tManager.addTexture( { "name" : "BT."+textSurf ,
+                                 "create" : graphics.button.createButton ,
+                                 "links" : [ self ] } )
 
     def isClick(self,pos):
+        surf = g.tManager.get(self.textName).surf
         x,y = self.pos
-        xLeft = x- self.surf.get_width()/2
+        xLeft = x- surf.get_width()/2
         yTop = y
-        xRight = xLeft + self.surf.get_width()
-        yBottom = yTop + self.surf.get_height()
+        xRight = xLeft + surf.get_width()
+        yBottom = yTop + surf.get_height()
 
         xM,yM = pos
         if( xLeft< xM and xRight > xM and yTop<yM and yBottom>yM):
@@ -105,12 +92,13 @@ class Button:
     def draw(self,dest,offset=(0,0)):
         x,y = self.pos
         offX , offY = offset
-        dest.blit( self.surf, (x- self.surf.get_width()/2 + offX,y + offY) )
-        
+        surf = g.tManager.get(self.textName).surf
+        g.tManager.blit(dest , self.textName , (x- surf.get_width()/2 + offX,y + offY) )
 
     def blitCenter(self,dest,pos):
         x,y = pos
-        dest.blit( self.surf, (x- self.surf.get_width()/2,y) )
+        surf = g.tManager.get(self.textName).surf
+        g.tManager.blit( dest , self.textName , (x- surf.get_width()/2,y) )
 
 
 

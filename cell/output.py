@@ -30,7 +30,7 @@ from pygame.locals import *
 import cell.cell
 import util
 import math
-import colors
+import graphics.colors as colors
 
 class Output(cell.cell.Cell):
     def __init__(self,infos):
