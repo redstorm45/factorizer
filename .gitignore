@@ -22,8 +22,9 @@ var/
 .installed.cfg
 *.egg
 
-# Geany script
+# Geany
 geany_run_script.bat
+projet.geany
 
 #pictures
 *.png

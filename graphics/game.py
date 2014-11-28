@@ -40,6 +40,11 @@ def createBtFastTx(self):
     pygame.draw.polygon( self.surf , g.color.playGreen , [ (8,13)   , (8,27)  , (20,20) ] )
     pygame.draw.polygon( self.surf , g.color.playGreen , [ (20,13)  , (20,27) , (32,20) ] )
     
+def createBtRewindTx(self):
+    self.surf  = pygame.Surface( (40,40) , SRCALPHA)
+    pygame.draw.polygon( self.surf , g.color.playGreen , [ (20,13)  , (20,27) , (8,20)  ] )
+    pygame.draw.polygon( self.surf , g.color.playGreen , [ (32,13)  , (32,27) , (20,20) ] )
+    
 def createBtPauseTx(self):
     self.surf  = pygame.Surface( (40,40) , SRCALPHA)
     pygame.draw.polygon( self.surf , g.color.playBlue  , [ (10,10)  , (15,10) , (15,30) , (10,30) ] )

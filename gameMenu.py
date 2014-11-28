@@ -28,9 +28,9 @@
         and have a preview of it.
 
         TO DO:
-            -finish preview
             -add levels
-            -make online playing
+            -finish texturing everything
+            -make online playing ?
               -create a level server
               -create editor
               -make a rank board ?
@@ -200,15 +200,17 @@ class GameMenu:
                 self.currentScreen = TRANS_EDIT_PLAY
                 self.idleTransition = 0
                 self.offsetTransition = 0
+                self.playground.playing = True
+                self.playground.destPlaySpeed = 8.0
+                self.playground.playSpeed = 1.0
             self.playground.clickEdit(pos)
         if self.currentScreen == SCR_PLAY:
             if(self.playground.playBtStop.isClick(pos)):
                 self.currentScreen = TRANS_PLAY_EDIT
                 self.idleTransition = 0
                 self.offsetTransition = 0
-                self.playground.destPlaySpeed = 1.0
+                self.playground.destPlaySpeed = 8.0
                 self.playground.playSpeed = 1.0
-                self.playground.playing = False
                 self.playground.stopped = False
             if(self.playground.playBtPlay.isClick(pos)):
                 if not self.playground.stopped:
@@ -217,6 +219,9 @@ class GameMenu:
             if(self.playground.playBtFast.isClick(pos)):
                 if self.playground.destPlaySpeed < 16.0:
                     self.playground.destPlaySpeed *= 2.0
+            if(self.playground.playBtRewind.isClick(pos)):
+                if self.playground.destPlaySpeed > 1.0:
+                    self.playground.destPlaySpeed /= 2.0
             if(self.playground.playBtPause.isClick(pos)):
                 self.playground.playing = False
                 self.playground.stopped = True

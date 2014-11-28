@@ -102,6 +102,9 @@ class Game:
         g.tManager.addTexture( { "name" : "editor.btTx.fast" ,
                                  "create" : graphics.game.createBtFastTx ,
                                  "temp" : True} )
+        g.tManager.addTexture( { "name" : "editor.btTx.rewind" ,
+                                 "create" : graphics.game.createBtRewindTx ,
+                                 "temp" : True} )
         g.tManager.addTexture( { "name" : "editor.btTx.pause" ,
                                  "create" : graphics.game.createBtPauseTx ,
                                  "temp" : True} )
@@ -119,23 +122,25 @@ class Game:
                                  "temp" : True} )
         
         #buttons
-        self.playBtPlay  = button.Button( "editor.btTx.play"   , self.color.buttonMenu , (50,50), 1.2 )
-        self.playBtFast  = button.Button( "editor.btTx.fast"   , self.color.buttonMenu , (50,50), 1.2 )
-        self.playBtPause = button.Button( "editor.btTx.pause"  , self.color.buttonMenu , (50,50), 1.2 )
-        self.playBtStop  = button.Button( "editor.btTx.stop"   , self.color.buttonMenu , (50,50), 1.2 )
-        self.endBtReplay = button.Button( "player.btTx.replay" , self.color.buttonMenu , (50,50), 1.2 , True , None )
-        self.endBtLevels = button.Button( "player.btTx.levels" , self.color.buttonMenu , (50,50), 1.2 , True , None )
-        self.endBtNext   = button.Button( "player.btTx.next"   , self.color.buttonMenu , (50,50), 1.2 , True , None )
-        self.playBtPlay.pos  = (100,420)
-        self.playBtFast.pos  = (200,420)
-        self.playBtPause.pos = (300,420)
-        self.playBtStop.pos  = (400,420)
-        self.endBtReplay.pos = (120,420)
-        self.endBtLevels.pos = (250,420)
-        self.endBtNext.pos   = (380,420)
+        self.playBtPlay   = button.Button( "editor.btTx.play"   , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtFast   = button.Button( "editor.btTx.fast"   , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtRewind = button.Button( "editor.btTx.rewind" , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtPause  = button.Button( "editor.btTx.pause"  , self.color.buttonMenu , (50,50), 1.2 )
+        self.playBtStop   = button.Button( "editor.btTx.stop"   , self.color.buttonMenu , (50,50), 1.2 )
+        self.endBtReplay  = button.Button( "player.btTx.replay" , self.color.buttonMenu , (50,50), 1.2 , True , None )
+        self.endBtLevels  = button.Button( "player.btTx.levels" , self.color.buttonMenu , (50,50), 1.2 , True , None )
+        self.endBtNext    = button.Button( "player.btTx.next"   , self.color.buttonMenu , (50,50), 1.2 , True , None )
+        self.playBtPlay.pos   = (300,420)
+        self.playBtRewind.pos = (100,420)
+        self.playBtFast.pos   = (200,420)
+        self.playBtPause.pos  = (300,420)
+        self.playBtStop.pos   = (400,420)
+        self.endBtReplay.pos  = (120,420)
+        self.endBtLevels.pos  = (250,420)
+        self.endBtNext.pos    = (380,420)
         
         #variable
-        self.playing = False
+        self.playing = True
         self.stopped = False
         self.playSpeed = 1.0
         self.destPlaySpeed = 1.0
@@ -335,9 +340,12 @@ class Game:
         self.editorBtTest.draw(self.window,offsetButtons)
         
         if iterateEnd != 0:
-            self.playBtPlay.draw(self.window,offsetPlaybar)
             self.playBtFast.draw(self.window,offsetPlaybar)
-            self.playBtPause.draw(self.window,offsetPlaybar)
+            self.playBtRewind.draw(self.window,offsetPlaybar)
+            if self.playing:
+                self.playBtPause.draw(self.window,offsetPlaybar)
+            else:
+                self.playBtPlay.draw(self.window,offsetPlaybar)
             self.playBtStop.draw(self.window,offsetPlaybar)
         
         #drawing the level
