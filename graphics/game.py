@@ -76,5 +76,25 @@ def createBtNextTx(self):
     self.surf  = pygame.Surface( (40,40) , SRCALPHA)
     pygame.draw.polygon( self.surf   , g.color.playGreen  , [ (25,10) , (30,10) , (30,30) , (25,30) ] )
     pygame.draw.polygon( self.surf   , g.color.playGreen  , [ (10,10) , (10,30) , (25,20) ] )
+
+def createEndLvlTx(self):
+    #create surface
+    self.surf = pygame.Surface( (500,500) , SRCALPHA )
     
+    #draw big rectangle
+    pygame.draw.polygon( self.surf, g.color.endBackground , [
+                         (40,40) , (460,40) , (460,500) , (40,500)
+                         ] )
+    
+    #make transparent
+    self.surf.lock()
+    for x in range(self.surf.get_width()):
+        for y in range(self.surf.get_height()):
+            red,green,blue,a = self.surf.get_at( (x,y) )
+            self.surf.set_at( (x,y) , (red,green,blue,a*0.5) )
+    self.surf.unlock()
+    
+    #add buttons
+    for name in [ "BT.player.btTx.replay" , "BT.player.btTx.levels" , "BT.player.btTx.next" ]:
+        g.tManager.blit(self.surf , name , g.tManager.get(name).links[0].pos )
 

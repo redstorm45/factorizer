@@ -85,6 +85,12 @@ class GameMenu:
         
         g.color = graphics.colors.theColors
         g.tManager = textureManager.TextureManager()
+        #fonts
+        g.tManager.addFont("title"    ,None,60)
+        g.tManager.addFont("xlButtons",None,50) #extra large buttons
+        g.tManager.addFont("lButtons" ,None,40) #large buttons
+        g.tManager.addFont("mButtons" ,None,30) #medium buttons
+        g.tManager.addFont("sButtons" ,None,20) #small buttons
 
         g.lManager = levelManager.LevelManager()
         g.lManager.loadLevels()
@@ -93,30 +99,14 @@ class GameMenu:
 
     def initMenu(self):
         print("managers : ",g.tManager,g.lManager)
-        #fonts
-        g.tManager.addFont("title"    ,None,60)
-        g.tManager.addFont("xlButtons",None,50) #extra large buttons
-        g.tManager.addFont("lButtons" ,None,40) #large buttons
-        g.tManager.addFont("mButtons" ,None,30) #medium buttons
-        g.tManager.addFont("sButtons" ,None,20) #small buttons
-        #generate texts
-        g.tManager.addTexture( { "name" : "menu.title"     ,
-                               "create" : graphics.menu.createTitle } )
-        g.tManager.addTexture( { "name" : "menu.btTxt.lvl" ,
-                               "create" : graphics.text.createText ,
-                               "temp" : True , "links" : ["title","Levels"] } )
-        g.tManager.addTexture( { "name" : "menu.btTxt.chal" ,
-                               "create" : graphics.text.createText ,
-                               "temp" : True , "links" : ["title","Challenges"] } )
-        g.tManager.addTexture( { "name" : "menu.btTxt.back" ,
-                               "create" : graphics.text.createText ,
-                               "temp" : True , "links" : ["lButtons","Back"] } )
+        #make textures
+        g.tManager.loadTextureList("menu")
         #buttons
         self.menuBtLvl = button.Button( "menu.btTxt.lvl"  , g.color.buttonMenu , (350,75) , 1.05 )
         self.menuBtChal= button.Button( "menu.btTxt.chal" , g.color.buttonMenu , (350,75), 1.05 )
+        self.menuBtBack= button.Button( "menu.btTxt.back" , g.color.buttonMenu , (100,50), 1.15 )
         self.menuBtLvl.pos = (250,175)
         self.menuBtChal.pos = (250,325)
-        self.menuBtBack= button.Button( "menu.btTxt.back" , g.color.buttonMenu , (100,50), 1.15 )
         self.menuBtBack.pos = (250,425)
         self.listBtLevels = []
         for y in range(4):

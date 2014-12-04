@@ -26,6 +26,7 @@
 
 import graphics.texture as texture
 import graphics.colors
+import graphics.textureList
 import globalVars
 from pygame.locals import *
 import pygame
@@ -37,6 +38,12 @@ class TextureManager:
     def __init__(self):
         self.textureDict = {}
         self.fonts = {}
+        self.listing = graphics.textureList.textureListing()
+    
+    def loadTextureList(self,name):
+        description = self.listing.get(name)
+        for t in description:
+            self.addTexture(t)
          
     def addTexture(self,t):
         #create the texture object before adding it
@@ -54,7 +61,7 @@ class TextureManager:
             return None
         t = self.textureDict[name]
         #check that it is created -> create it if not
-        if not t.loaded:
+        if (not t.loaded) and (not t.unfinished):
             t.create(t)
             t.loaded = True
         return t

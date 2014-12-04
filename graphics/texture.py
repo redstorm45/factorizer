@@ -30,28 +30,46 @@ class Texture:
         
         #only load texture if there is a name
         if "name" in data.keys() and "create" in data.keys():
-            self.name = data["name"]     #name of the texture
-            self.create = data["create"] #method used to create the texture
-            self.loaded = False          #if the texture is currently in memory (surf arg. exists)
-            self.surf = None             #the pygame surface of the texture
+            self.name       = None     #name of the texture
+            self.create     = None     #method used to create the texture
+            self.loaded     = False    #if the texture is currently in memory (surf arg. exists)
+            self.surf       = None     #the pygame surface of the texture
+            self.priority   = 1        #priority of the surface
+            self.temp       = False    #temporary textures (to make other ones)
+            self.links      = []       #links needed to make the texture (to buttons, texts , etc... )
+            self.unfinished = False    #some data is still missing
             
-            try:
-                self.priority = data["priority"]
-            except:
-                self.priority = 1 #only need basic priority checks
+            for i in data.keys():
+                self.setData( i ,data[i] )
             
-            #if a texture is marked as temporary, it will be deleted as soon as not in use
-            #and regenerated when needed
-            try:
-                self.temp = data["temp"]
-            except:
-                self.temp = False #can be deleted at any time, but not ASAP
-            
-            try:
-                self.links = data["links"]
-            except:
-                self.links = []
+            # if a texture is marked as temporary, it will be deleted as soon as not in use
+            # and regenerated when needed. else, it
+            # can be deleted at any time, but not ASAP
             
         else:
             self.name = "unvalid"
-        
+            
+    def setData(self,name,data):
+        if name == "name":
+            self.name = data
+        elif name == "create":
+            self.create = data
+        elif name == "priority":
+            self.priority = data
+        elif name == "temp":
+            self.temp = data
+        elif name == "links":
+            if self.links:
+                for i in range(len(data)):
+                    if data[i]:
+                        self.links[i] = data[i]
+            else:
+                self.links = data
+        elif name == "unfinished":
+            self.unfinished = data
+        return self #to make multiple assignation
+    
+    def finish(self):
+        self.setData("unfinished",False)
+            
+        return self #to make multiple assignation

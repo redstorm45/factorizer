@@ -35,6 +35,7 @@ class Color:
         self.textButtonMenu = (50 ,50 ,50 )
         self.titleFront     = (200,200,200)
         self.titleShadow    = (100,100,100)
+        self.endBackground  = (100,100,100)
         self.playGreen      = (13 ,125,27 )
         self.playBlue       = (11 ,83 ,145)
         self.playRed        = (192,13 ,0  )

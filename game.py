@@ -58,12 +58,7 @@ class Game:
 
     def initEditor(self):
         #generate texts
-        g.tManager.addTexture( { "name" : "editor.btText.back" ,
-                                 "create" : graphics.text.createText ,
-                                 "temp" : True , "links" : ["sButtons","Back"] } )
-        g.tManager.addTexture( { "name" : "editor.btText.test" ,
-                                 "create" : graphics.text.createText ,
-                                 "temp" : True , "links" : ["sButtons","Test"] } )
+        g.tManager.loadTextureList("editor")
         
         #make buttons
         self.editorBtBack = button.Button( "editor.btText.back" , self.color.buttonMenu     , (75,30), 1.15 )
@@ -96,31 +91,7 @@ class Game:
     def initPlayer(self):
         global g
         #making button textures
-        g.tManager.addTexture( { "name" : "editor.btTx.play" ,
-                                 "create" : graphics.game.createBtPlayTx ,
-                                 "temp" : True} )
-        g.tManager.addTexture( { "name" : "editor.btTx.fast" ,
-                                 "create" : graphics.game.createBtFastTx ,
-                                 "temp" : True} )
-        g.tManager.addTexture( { "name" : "editor.btTx.rewind" ,
-                                 "create" : graphics.game.createBtRewindTx ,
-                                 "temp" : True} )
-        g.tManager.addTexture( { "name" : "editor.btTx.pause" ,
-                                 "create" : graphics.game.createBtPauseTx ,
-                                 "temp" : True} )
-        g.tManager.addTexture( { "name" : "editor.btTx.stop" ,
-                                 "create" : graphics.game.createBtStopTx ,
-                                 "temp" : True} )
-        g.tManager.addTexture( { "name" : "player.btTx.replay" ,
-                                 "create" : graphics.game.createBtReplayTx ,
-                                 "temp" : True} )
-        g.tManager.addTexture( { "name" : "player.btTx.levels" ,
-                                 "create" : graphics.game.createBtLevelsTx ,
-                                 "temp" : True} )
-        g.tManager.addTexture( { "name" : "player.btTx.next" ,
-                                 "create" : graphics.game.createBtNextTx ,
-                                 "temp" : True} )
-        
+        g.tManager.loadTextureList("player")
         #buttons
         self.playBtPlay   = button.Button( "editor.btTx.play"   , self.color.buttonMenu , (50,50), 1.2 )
         self.playBtFast   = button.Button( "editor.btTx.fast"   , self.color.buttonMenu , (50,50), 1.2 )
@@ -150,17 +121,9 @@ class Game:
         self.level.makeCellReference()
         
         #make the end level surface
-        self.endLvlSurf = pygame.Surface( (500,500) , SRCALPHA )
-        pygame.draw.polygon( self.endLvlSurf, (100,100,100) , [
-                              (40,40) , (460,40) , (460,480) , (40,480)
-                              ] )
-        self.endLvlSurf.lock()
-        for x in range(self.endLvlSurf.get_width()):
-            for y in range(self.endLvlSurf.get_height()):
-                red,green,blue,a = self.endLvlSurf.get_at( (x,y) )
-                self.endLvlSurf.set_at( (x,y) , (red,green,blue,a*0.5) )
-        self.endLvlSurf.unlock()
-                
+        g.tManager.addTexture( { "name" : "player.endLevel" ,
+                                 "create" : graphics.game.createEndLvlTx } )
+        
         
     def makePreview(self):
         global g
@@ -168,15 +131,8 @@ class Game:
         self.fontTitle = pygame.font.Font(None,50)
         self.fontButtons = pygame.font.Font(None,30)
         #generate texts
-        g.tManager.addTexture( { "name" : "preview.levelTitle" ,
-                                 "create" : graphics.text.createText ,
-                                 "temp" : True , "links" : ["xlButtons",self.level.name,g.color.titleFront] } )
-        g.tManager.addTexture( { "name" : "preview.btText.back" ,
-                                 "create" : graphics.text.createText ,
-                                 "temp" : True , "links" : ["mButtons","Back"] } )
-        g.tManager.addTexture( { "name" : "preview.btText.play" ,
-                                 "create" : graphics.text.createText ,
-                                 "temp" : True , "links" : ["mButtons","Play"] } )
+        g.tManager.loadTextureList("preview")
+        g.tManager.get("preview.levelTitle" ).setData("links",[None,self.level.name,None]).finish()
         #make buttons
         self.previewBtBack = button.Button( "preview.btText.back" , self.color.buttonMenu , (100,50), 1.15 )
         self.previewBtPlay = button.Button( "preview.btText.play" , self.color.buttonMenu , (100,50), 1.15 )
@@ -401,11 +357,7 @@ class Game:
             self.visibleTools[i].draw(self.window,offsetToolbar)
             
         #draw end screen
-        self.window.blit( self.endLvlSurf , offsetEnd )
-        
-        self.endBtReplay.draw(self.window,offsetEnd)
-        self.endBtLevels.draw(self.window,offsetEnd)
-        self.endBtNext.draw(self.window,offsetEnd)
+        g.tManager.blit(self.window,"player.endLevel",offsetEnd)
     
     def getAdjCells(self,x,y):
         return [self.getCellAt(x+1,y),
