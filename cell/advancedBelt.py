@@ -20,26 +20,23 @@
 
 
     Description:
-        The "Belt" cell is used to transport boxes around
-        it is so simple they cannot be rotated
+        The "AdvancedBelt" cell is more advanced than the simple one,
+        such that it can respond to control signals
 '''
 
 
 import pygame
 import math
 from pygame.locals import *
-import cell.cell
+import cell.belt
 import util
 import graphics.colors as colors
 import globalVars as g
 
-class Belt(cell.cell.Cell):
-    
+class AdvancedBelt(cell.belt.Belt):
     def __init__(self,infos):
         self.orient = int(infos[0])
-        
-        self.hasDetector = False
-        self.activeDetector = False
+        self.activeOrient = int(infos[1])
 
     def makeSurf(self,size):#size is the size of the base square
         outSize = size * 5/4
@@ -70,7 +67,7 @@ class Belt(cell.cell.Cell):
             arrow = util.rotatePoints(arrow, self.orient*math.pi/2 +math.pi)
             arrow = util.translatePoints(arrow, (size/2,size/2) )
             listArrowsPoints.append(arrow)
-        
+
         #colors
         colBase  = g.color.getForCell("any","base")
         colRight = g.color.getForCell("any","right")
@@ -83,26 +80,7 @@ class Belt(cell.cell.Cell):
         #draw outputting arrow
         for i in range(3):
             pygame.draw.polygon( self.staticSurf , colArrow , listArrowsPoints[i] )
-            
-        if self.hasDetector:
-            colDetect = g.color.getForCell(self.detectorColor,"detector")
-            if self.activeDetector:
-                colDetect = g.color.getForCell(self.detectorColor,"activeDetector")
-            dim1 = size/2
-            dim2 = size/8
-            points = [ (-dim1     ,dim1     ) ,
-                       (-dim1+dim2,dim1-dim2) ,
-                       ( dim1-dim2,dim1-dim2) ,
-                       ( dim1     ,dim1     ) ]
-                       
-            points2 = [ (dim1     ,dim1     ) ,
-                       (dim1-dim2,dim1     ) ,
-                       (dim1-dim2,dim1-dim2) ,
-                       (dim1     ,dim1-dim2) ]
-            for i in range(4):
-                pts = util.translatePoints( util.rotatePoints( points, i*math.pi/2) , (dim1,dim1) )
-                pygame.draw.polygon( self.baseSurf , colDetect , pts )
-                
+        
 
     def draw(self,window,pos):
         window.blit( self.baseSurf , pos )
@@ -115,42 +93,27 @@ class Belt(cell.cell.Cell):
         self.iterAnim += 3*speed
         if self.iterAnim >= 50.0:
             self.iterAnim -= 50.0
-        #update detector
-        if self.hasDetector:
-            lBox = self.level.physicManager.listBoxes
-            prev = self.activeDetector
-            activ = False #if the detector should activate
-            deact = False #if the detector should deactivate
-            for b in lBox:
-                if self.x == int(b.x) and self.y == int(b.y):
-                    if b.color == g.color.getForCell(self.detectorColor,"base"):
-                        activ = True
-                    else:
-                        deact = True
-            if activ:
-                self.activeDetector = True
-            elif deact:
-                self.activeDetector = False
-                
-            if prev != self.activeDetector:
-                self.makeSurf( self.baseSurf.get_width() * 4/5 )
 
     def makeAnimSurf(self,size,adjCell = [None,None,None,None]):
         #detect adjacent cells
         nextPresent = False
         prevPresent = False
-        if isinstance( adjCell[self.orient] , Belt ):
+        
+        if isinstance( adjCell[self.orient] , cell.belt.Belt ):
             if adjCell[self.orient].orient == self.orient:
                 nextPresent = True
-        if isinstance( adjCell[(self.orient+2)%4] , Belt ):
+        if isinstance( adjCell[(self.orient+2)%4] , cell.belt.Belt ):
             if adjCell[(self.orient+2)%4].orient == self.orient:
                 prevPresent = True
+                
         xSubOffset = size*0.1
+        ySubOffset = size*0.1
+        
         if ((self.orient == 0 and prevPresent) or (self.orient == 2 and nextPresent)):
             xSubOffset = 0
-        ySubOffset = size*0.1
         if ((self.orient == 1 and prevPresent) or (self.orient == 3 and nextPresent)):
             ySubOffset = 0
+        
         
         #build surfaces
         outSize = size * 5/4
@@ -184,3 +147,4 @@ class Belt(cell.cell.Cell):
 
 
     
+

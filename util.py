@@ -30,19 +30,11 @@ import math
 def multColor(col,ratio):
     r,g,b = col
     return (r*ratio,g*ratio,b*ratio)
-
-def getColorFromStr(name):
-    if name == "red":
-        return (250,10,10)
-    if name == "green":
-        return (10,250,10)
-    if name == "blue":
-        return (10,10,250)
-    if name == "any":
-        return (128,128,128)
-    if name == "white":
-        return (250,250,250)
-    return (0,0,0)
+    
+def multColors(col1,col2): #col 1 is a mask , col2 is the base color
+    r1,g1,b1 = col1
+    r2,g2,b2 = col2
+    return ( int(r1*r2/255) , int(g1*g2/255) , int(b1*b2/255) )
 
 def translatePoints(listOfPoints,offset):
     secondList= []

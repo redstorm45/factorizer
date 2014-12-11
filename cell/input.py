@@ -32,11 +32,13 @@ import cell.cell
 import box.box
 import util
 import graphics.colors as colors
+import globalVars as g
+from random import randint
 
 class Input(cell.cell.Cell):
     def __init__(self,infos):
         self.orient = int(infos[0])
-        self.color = util.getColorFromStr(infos[1])
+        self.color = infos[1]
         self.spawnConfig = int(infos[2])
 
         self.standardSpawn = (self.spawnConfig < 0)
@@ -88,15 +90,20 @@ class Input(cell.cell.Cell):
                             (size/4+size/16,-size/4)]
         pointsArrow = util.translatePoints( util.rotatePoints( baseArrowPoints , self.orient*math.pi/2 ) , (size/2,size/2) )
 
+        colBase  = g.color.getForCell(self.color,"base")
+        colRight = g.color.getForCell(self.color,"right")
+        colFront = g.color.getForCell(self.color,"front")
+        colArrow = g.color.getForCell(self.color,"arrow")
+        
         #shadow inside the hole
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellRight , pointsHoleLeft )
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellFront , pointsHoleTop )
+        pygame.draw.polygon( self.baseSurf , colRight , pointsHoleLeft )
+        pygame.draw.polygon( self.baseSurf , colFront , pointsHoleTop )
         #draw the basic shape
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellBase , pointsTop )
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellRight , pointsRight )
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellFront , pointsFront )
+        pygame.draw.polygon( self.baseSurf , colBase , pointsTop )
+        pygame.draw.polygon( self.baseSurf , colRight , pointsRight )
+        pygame.draw.polygon( self.baseSurf , colFront , pointsFront )
         #draw outputting arrow
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellArrow , pointsArrow )
+        pygame.draw.polygon( self.baseSurf , colArrow , pointsArrow )
     
     def draw(self,window,pos):
         window.blit( self.baseSurf , pos )
@@ -119,9 +126,32 @@ class Input(cell.cell.Cell):
                 self.inputtingBox = None
     
     def buildBox(self):
-        newBox = box.box.Box( self.color , self.x+0.5 , self.y+0.5 , self.size*0.5 )
+        newBox = None
+        if self.standardSpawn:
+            newBox = box.box.Box( self.color , self.x+0.5 , self.y+0.5 , self.size*0.5 )
+        else:
+            color = self.getColorForSpawn()
+            newBox = box.box.Box( color , self.x+0.5 , self.y+0.5 , self.size*0.5 )
         return newBox
-
+    
+    def getColorForSpawn(self):
+        spawnCfg = self.level.inputConfigs[ self.spawnConfig ]
+        distrib = spawnCfg["distrib"]
+        choice = 0
+        if distrib["type"] == "random":
+            s = 0
+            for p in distrib["proba"]:
+                s += p
+            alea = randint(0,s*1000) / 1000
+            
+            s=0
+            for i in range(len(distrib["proba"])):
+                if alea >= s and alea < s+distrib["proba"][i]:
+                    choice = i
+                s += distrib["proba"][i]
+        
+        return spawnCfg["colors"][choice]
+            
     def makeAnimSurf(self,size):
         if self.inputtingBox and self.iterAnim >= 100 and self.iterAnim <= 150:
             animSize = size * 3/4

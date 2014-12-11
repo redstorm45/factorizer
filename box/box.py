@@ -27,11 +27,11 @@
 import pygame
 import util
 from pygame.locals import *
-
+import globalVars as g
 
 class Box:
     def __init__(self,color,x,y,size):
-        self.color = color
+        self.color = g.color.getForCell( color , "base" )
         self.size = size
         self.x = x
         self.y = y

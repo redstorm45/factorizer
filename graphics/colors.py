@@ -23,6 +23,7 @@
         This class contains all the colors
 '''
 
+import util
 
 
 class Color:
@@ -40,10 +41,39 @@ class Color:
         self.playBlue       = (11 ,83 ,145)
         self.playRed        = (192,13 ,0  )
         
-        self.cellBase       = (175,175,175)
-        self.cellRight      = (140,140,140)
-        self.cellFront      = (87 ,87 ,87 )
-        self.cellArrow      = (87 ,87 ,87 )
+        self.cellBase       = (200,200,200)
+        self.cellRight      = (160,160,160)
+        self.cellFront      = (100,100,100)
+        self.cellArrow      = (100,100,100)
+        
+        self.detector       = (120,120,120)
+        self.activeDetector = (220,220,220)
+        
+        self.baseColors = {
+            "red":  (250,20 ,20 ) ,
+            "green":(20 ,250,20 ) ,
+            "blue": (20 ,20 ,250) ,
+            "any":  (200,200,200) ,
+            "white":(250,250,250) ,
+            }
+            
+    def getForCell(self,col,side):
+        try:
+            if side == "base":
+                return util.multColors( self.baseColors[col] , self.cellBase )
+            elif side == "right":
+                return util.multColors( self.baseColors[col] , self.cellRight )
+            elif side == "front":
+                return util.multColors( self.baseColors[col] , self.cellFront )
+            elif side == "arrow":
+                return util.multColors( self.baseColors[col] , self.cellArrow )
+            elif side == "detector":
+                return util.multColors( self.baseColors[col] , self.detector )
+            elif side == "activeDetector":
+                return util.multColors( self.baseColors[col] , self.activeDetector )
+        except:
+            pass
+        return (0,0,0)
 
 theColors = Color()
         

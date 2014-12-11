@@ -29,7 +29,9 @@ import level
 import cell.input
 import cell.output
 import cell.belt
+import cell.advancedBelt
 import cell.toolCell
+import cell.detector
 
 class LevelManager:
     def __init__(self):
@@ -133,6 +135,12 @@ class LevelManager:
             elif dList[1][0:4] == "belt":
                 opt = dList[1][5:].strip(")").split(",")
                 toolObject = cell.belt.Belt(opt)
+            elif dList[1][0:7] == "advbelt":
+                opt = dList[1][8:].strip(")").split(",")
+                toolObject = cell.advancedBelt.AdvancedBelt(opt)
+            elif dList[1][0:6] == "detect":
+                opt = dList[1][7:].strip(")").split(",")
+                toolObject = cell.detector.Detector(opt)
         except Exception as e:
             print(str(e)) #debugging
         else:
@@ -141,7 +149,14 @@ class LevelManager:
         return None
         
     def readInConfig(self,data):
-        return None
+        listData = data.split("]",1)
+        colors = listData[0][1:].split(",") #list of possible colors
+        distrib = {}
+        if listData[1][0] == "r":    #random creation
+            distrib["type"] = "random"
+            probs = listData[1].strip("r[").rstrip("]").split(",")
+            distrib["proba"] = [ float(i) for i in probs ]
+        return { "colors" : colors , "distrib" : distrib }
 
     def readObjective(self,data,table):
         listData = data.split(".",1)

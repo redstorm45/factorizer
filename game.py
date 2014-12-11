@@ -191,23 +191,38 @@ class Game:
             cellX = int( (x-150) / cellSize )
             cellY = int( (y-50) / cellSize )
             if cellX < self.level.width and cellY < self.level.height and cellX >= 0 and cellY >= 0:
-                if self.level.table[cellX][cellY]:
-                    #remove old object (replace in toolbar)
-                    if self.level.table[cellX][cellY].placed:
-                        for t in self.listTools:
-                            if t.matchItem( self.level.table[cellX][cellY] ):
-                                t.number += 1
-                                t.rebuildNumSurf()
-                                self.level.table[cellX][cellY] = None
-                                self.makeLvlSurf()
+                if self.selectedTool:
+                    if self.level.table[cellX][cellY] and not isinstance(self.selectedTool.object, cell.detector.Detector) :
+                        #remove old object (replace in toolbar)
+                        if self.level.table[cellX][cellY].placed:
+                            for t in self.listTools:
+                                if t.matchItem( self.level.table[cellX][cellY] ):
+                                    t.number += 1
+                                    t.rebuildNumSurf()
+                            self.level.table[cellX][cellY] = None
+                            self.makeLvlSurf()
+                else:
+                    if self.level.table[cellX][cellY]:
+                        #remove old object (replace in toolbar)
+                        if self.level.table[cellX][cellY].placed:
+                            for t in self.listTools:
+                                if t.matchItem( self.level.table[cellX][cellY] ):
+                                    t.number += 1
+                                    t.rebuildNumSurf()
+                            self.level.table[cellX][cellY] = None
+                            self.makeLvlSurf()
                 if self.selectedTool:
                     if self.selectedTool.number > 0:
                         #update table (if cell not occupied)
-                        if not self.level.table[cellX][cellY]:
-                            self.putToolAtCell(cellX,cellY,cellSize)
+                        # if not self.level.table[cellX][cellY]:
+                        self.putToolAtCell(cellX,cellY,cellSize)
     
     def putToolAtCell(self,x,y,cellSize):
-        self.level.table[x][y] = self.selectedTool.buildCell()
+        if isinstance( self.selectedTool.object , cell.detector.Detector ):
+            self.level.table[x][y].hasDetector = True
+            self.level.table[x][y].detectorColor = self.selectedTool.object.color
+        else:
+            self.level.table[x][y] = self.selectedTool.buildCell()
         self.level.table[x][y].makeSurf(cellSize)
         self.selectedTool.number -= 1
         self.selectedTool.rebuildNumSurf()
@@ -251,8 +266,16 @@ class Game:
                     self.editorLvlSurf.blit( levelCell.baseSurf , (xPos,yPos) )
                     if levelCell.staticSurf:
                         self.editorLvlSurf.blit( levelCell.staticSurf , (xPos,yPos) )
+                    if self.selectedTool:
+                        if ( isinstance(self.selectedTool.object , cell.detector.Detector ) \
+                                and (x,y) == self.selectedTool.phantomPos ) \
+                                and isinstance(levelCell , cell.belt.Belt ) \
+                                and ( self.selectedTool.number > 0 )  :
+                            self.editorLvlSurf.blit( self.selectedTool.dispSurf , (xPos,yPos) )
                 elif self.selectedTool:
-                    if ( (x,y) == self.selectedTool.phantomPos) and self.selectedTool.number > 0:
+                    if ( (x,y) == self.selectedTool.phantomPos ) \
+                            and ( self.selectedTool.number > 0 ) \
+                            and ( not isinstance(self.selectedTool.object , cell.detector.Detector ) ):
                         xOffset,yOffset = self.selectedTool.dispObject.offset
                         xPos = xOffset + 50 + self.cellSize*x
                         yPos = yOffset + 50 + self.cellSize*y

@@ -31,6 +31,7 @@ from pygame.locals import *
 import cell.input
 import cell.output
 import cell.belt
+import cell.detector
 
 class ToolCell:
     def __init__(self,infos):
@@ -84,6 +85,11 @@ class ToolCell:
         return copy.copy(self.object)
     
     def matchItem(self, i):
+        print("checking if ",i," corresponds to ",self.object)
+        if isinstance( i , cell.belt.Belt ) and isinstance( self.object , cell.detector.Detector ):
+            if i.hasDetector:
+                if i.detectorColor == self.object.color:
+                    return True
         if not isinstance( i , self.object.__class__ ):
             return False
         if (isinstance( i , cell.input.Input ) or 

@@ -31,11 +31,12 @@ import cell.cell
 import util
 import math
 import graphics.colors as colors
+import globalVars as g
 
 class Output(cell.cell.Cell):
     def __init__(self,infos):
         self.orient = int(infos[0])
-        self.color = util.getColorFromStr(infos[1])
+        self.color = infos[1]
         self.id = int(infos[2])
         self.tooltip = None
         
@@ -81,21 +82,26 @@ class Output(cell.cell.Cell):
                             (size/2-size/16,size/4),
                             (size/2-size/16,-size/4)]
         pointsArrow = util.translatePoints( util.rotatePoints( baseArrowPoints , self.orient*math.pi/2 ) , (size/2,size/2) )
-
+        
+        #colors
+        colBase  = g.color.getForCell(self.color,"base")
+        colRight = g.color.getForCell(self.color,"right")
+        colFront = g.color.getForCell(self.color,"front")
+        colArrow = g.color.getForCell(self.color,"arrow")
         #shadow inside the hole
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellRight , pointsHoleLeft )
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellFront , pointsHoleTop )
+        pygame.draw.polygon( self.baseSurf , colRight , pointsHoleLeft )
+        pygame.draw.polygon( self.baseSurf , colFront , pointsHoleTop )
         #draw the basic shape
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellBase  , pointsTop )
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellRight , pointsRight )
-        pygame.draw.polygon( self.baseSurf , colors.theColors.cellFront , pointsFront )
+        pygame.draw.polygon( self.baseSurf , colBase  , pointsTop )
+        pygame.draw.polygon( self.baseSurf , colRight , pointsRight )
+        pygame.draw.polygon( self.baseSurf , colFront , pointsFront )
         #draw inputting arrow
         if self.orient == -1:
             for i in range(4):
                 pointsArrow = util.translatePoints( util.rotatePoints( baseArrowPoints , i*math.pi/2 ) , (size/2,size/2) )
-                pygame.draw.polygon( self.baseSurf , colors.theColors.cellArrow , pointsArrow )
+                pygame.draw.polygon( self.baseSurf , colArrow , pointsArrow )
         else:
-            pygame.draw.polygon( self.baseSurf , colors.theColors.cellArrow , pointsArrow )
+            pygame.draw.polygon( self.baseSurf , colArrow , pointsArrow )
 
     def draw(self,window,pos):
         window.blit( self.baseSurf , pos )
@@ -119,7 +125,7 @@ class Output(cell.cell.Cell):
             self.animSurf = None
 
     def takeBox(self,b):
-        if self.tooltip:
+        if self.tooltip and (b.color == g.color.getForCell( self.color , "base" ) ) or ( self.color == "any" ):
             self.tooltip.accept(b)
         self.iterAnim = 50
         self.outputtingBox = b

@@ -50,5 +50,5 @@ class Cell:
         pass
     
     #updating animation variables
-    def updateAnim(self):
+    def updateAnim(self,speed):
         pass
